@@ -859,6 +859,304 @@
             color: var(--success);
         }
 
+        /* ===== Calling / Reminder ===== */
+        .call-display {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius);
+            padding: 40px 28px;
+            text-align: center;
+            color: #FFFFFF;
+            box-shadow: 0 8px 32px rgba(74, 144, 217, 0.3);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .call-display.pulsing {
+            animation: callPulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes callPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(74, 144, 217, 0.3); }
+            50% { box-shadow: 0 8px 48px rgba(74, 144, 217, 0.6); }
+        }
+
+        .call-label {
+            font-size: 14px;
+            opacity: 0.85;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .call-number {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .call-name {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .call-room {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .call-idle .call-number {
+            font-size: 28px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        .call-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .call-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .call-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .call-btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .call-btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .call-btn-primary:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .call-btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .call-btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .call-btn-danger {
+            background: var(--surface);
+            color: #E74C3C;
+            border: 1px solid #FADBD8;
+        }
+
+        .call-btn-danger:hover {
+            background: #FADBD8;
+        }
+
+        .call-btn-danger:disabled {
+            color: var(--text-muted);
+            border-color: var(--border);
+            cursor: not-allowed;
+        }
+
+        /* Queue list */
+        .queue-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .queue-card h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .queue-count {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .queue-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .queue-item.current {
+            background: var(--primary-soft);
+            border-color: var(--primary);
+        }
+
+        .queue-item.called {
+            opacity: 0.45;
+        }
+
+        .queue-item-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+
+        .queue-item.current .queue-item-num {
+            background: var(--primary);
+            color: #FFFFFF;
+            border-color: var(--primary);
+        }
+
+        .queue-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .queue-item-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .queue-item-detail {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .queue-item-status {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .queue-item-status.waiting {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .queue-item-status.current {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .queue-item-status.done {
+            background: #F0F0F0;
+            color: var(--text-muted);
+        }
+
+        /* Add patient input */
+        .add-patient-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .add-patient-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+            min-width: 0;
+        }
+
+        .add-patient-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .add-patient-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .add-patient-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--text);
+            color: #FFFFFF;
+            padding: 14px 28px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 200;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* ===== Responsive ===== */
         @media (max-width: 640px) {
             .nav-links {
@@ -956,6 +1254,37 @@
                 width: 70px;
                 font-size: 12px;
             }
+
+            .call-display {
+                padding: 28px 16px;
+            }
+
+            .call-number {
+                font-size: 32px;
+            }
+
+            .call-name {
+                font-size: 18px;
+            }
+
+            .call-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .call-btn {
+                justify-content: center;
+            }
+
+            .add-patient-bar {
+                flex-direction: column;
+            }
+
+            .queue-item-num {
+                width: 36px;
+                height: 36px;
+                font-size: 13px;
+            }
         }
     </style>
 </head>
@@ -968,6 +1297,7 @@
             <li><a href="#home" class="active">首页</a></li>
             <li><a href="#guide">患者指南</a></li>
             <li><a href="#register">门诊挂号</a></li>
+            <li><a href="#calling">叫号提醒</a></li>
             <li><a href="#appointment">预约联系</a></li>
         </ul>
         <button class="nav-toggle" id="navToggle" aria-label="菜单">
@@ -1242,6 +1572,59 @@
         </div>
     </section>
 
+    <!-- ===== Calling / Reminder ===== -->
+    <section id="calling">
+        <h2 class="section-title">叫号提醒</h2>
+        <p class="section-subtitle">到号自动提醒患者姓名，点击"叫下一位"依次呼叫</p>
+
+        <!-- Call Display -->
+        <div class="call-display call-idle" id="callDisplay">
+            <div class="call-label">当前叫号</div>
+            <div class="call-number" id="callNumber">等待叫号</div>
+            <div class="call-name" id="callName">&nbsp;</div>
+            <div class="call-room" id="callRoom">&nbsp;</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="call-actions">
+            <button class="call-btn call-btn-primary" id="callNextBtn" onclick="callNext()">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                叫下一位
+            </button>
+            <button class="call-btn call-btn-secondary" id="recallBtn" onclick="reCall()" disabled>
+                <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                重新呼叫
+            </button>
+            <button class="call-btn call-btn-danger" id="skipBtn" onclick="skipCurrent()" disabled>
+                <svg viewBox="0 0 24 24"><path d="M6 6l12 12L6 18z" transform="rotate(90 12 12)"/><path d="M6 18l12-12L6 6z" transform="rotate(90 12 12)"/></svg>
+                跳过
+            </button>
+        </div>
+
+        <!-- Add Patient -->
+        <div class="queue-card" style="margin-bottom: 20px;">
+            <h3>添加候诊患者</h3>
+            <div class="add-patient-bar">
+                <input type="text" class="add-patient-input" id="patientNameInput" placeholder="输入患者姓名" onkeypress="if(event.key==='Enter')addPatient()">
+                <button class="add-patient-btn" onclick="addPatient()">加入队列</button>
+            </div>
+        </div>
+
+        <!-- Queue List -->
+        <div class="queue-card">
+            <h3>
+                <span>候诊队列</span>
+                <span class="queue-count" id="queueCount">0 人等待</span>
+            </h3>
+            <ul class="queue-list" id="queueList">
+                <li style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 14px;">暂无候诊患者，请在上方添加</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
     <!-- ===== Appointment & Contact ===== -->
     <section id="appointment">
         <h2 class="section-title">预约与联系</h2>
@@ -1501,6 +1884,201 @@
             });
         });
     })();
+
+    // ===== Calling / Reminder System =====
+    var queue = [
+        { name: "张伟", number: "A001", dept: "全科医学科", room: "第5诊室", status: "waiting" },
+        { name: "李娜", number: "A002", dept: "全科医学科", room: "第5诊室", status: "waiting" },
+        { name: "王芳", number: "A003", dept: "全科医学科", room: "第5诊室", status: "waiting" },
+        { name: "刘洋", number: "A004", dept: "全科医学科", room: "第5诊室", status: "waiting" },
+        { name: "陈静", number: "A005", dept: "全科医学科", room: "第5诊室", status: "waiting" },
+        { name: "赵磊", number: "A006", dept: "全科医学科", room: "第5诊室", status: "waiting" }
+    ];
+    var currentIdx = -1;
+    var numCounter = 6;
+    var audioCtx = null;
+
+    function getAudio() {
+        if (!audioCtx) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch(e) {
+                audioCtx = null;
+            }
+        }
+        return audioCtx;
+    }
+
+    function playBeep() {
+        var ctx = getAudio();
+        if (!ctx) return;
+        var now = ctx.currentTime;
+
+        // Three ascending beeps like a hospital chime
+        [523.25, 659.25, 783.99].forEach(function(freq, i) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            gain.gain.setValueAtTime(0, now + i * 0.15);
+            gain.gain.linearRampToValueAtTime(0.3, now + i * 0.15 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.4);
+            osc.start(now + i * 0.15);
+            osc.stop(now + i * 0.15 + 0.45);
+        });
+    }
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            var utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'zh-CN';
+            utter.rate = 0.9;
+            utter.pitch = 1.0;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utter);
+        }
+    }
+
+    function callNext() {
+        var nextIdx = -1;
+        for (var i = 0; i < queue.length; i++) {
+            if (queue[i].status === 'waiting') {
+                nextIdx = i;
+                break;
+            }
+        }
+
+        if (nextIdx === -1) {
+            showToast('队列已空，请先添加患者');
+            return;
+        }
+
+        if (currentIdx >= 0 && queue[currentIdx] && queue[currentIdx].status === 'current') {
+            queue[currentIdx].status = 'done';
+        }
+
+        currentIdx = nextIdx;
+        queue[currentIdx].status = 'current';
+
+        var p = queue[currentIdx];
+        var display = document.getElementById('callDisplay');
+        display.classList.remove('call-idle');
+        display.classList.add('pulsing');
+
+        document.getElementById('callNumber').textContent = p.number;
+        document.getElementById('callName').textContent = p.name;
+        document.getElementById('callRoom').textContent = '请前往 ' + p.room;
+
+        document.getElementById('recallBtn').disabled = false;
+        document.getElementById('skipBtn').disabled = false;
+
+        playBeep();
+        setTimeout(function() {
+            speak('请' + p.name + '到' + p.room + '就诊');
+        }, 600);
+
+        renderQueue();
+        showToast('已呼叫：' + p.name + '（' + p.number + '）');
+    }
+
+    function reCall() {
+        if (currentIdx < 0 || !queue[currentIdx] || queue[currentIdx].status !== 'current') return;
+        var p = queue[currentIdx];
+        playBeep();
+        setTimeout(function() {
+            speak('请' + p.name + '到' + p.room + '就诊');
+        }, 600);
+        var display = document.getElementById('callDisplay');
+        display.classList.remove('pulsing');
+        setTimeout(function() { display.classList.add('pulsing'); }, 50);
+        showToast('重新呼叫：' + p.name);
+    }
+
+    function skipCurrent() {
+        if (currentIdx < 0 || !queue[currentIdx] || queue[currentIdx].status !== 'current') return;
+        var p = queue[currentIdx];
+        p.status = 'done';
+        p.skipped = true;
+        showToast('已跳过：' + p.name + '（可稍后重新加入）');
+        currentIdx = -1;
+
+        var display = document.getElementById('callDisplay');
+        display.classList.add('call-idle');
+        display.classList.remove('pulsing');
+        document.getElementById('callNumber').textContent = '等待叫号';
+        document.getElementById('callName').innerHTML = '&nbsp;';
+        document.getElementById('callRoom').innerHTML = '&nbsp;';
+        document.getElementById('recallBtn').disabled = true;
+        document.getElementById('skipBtn').disabled = true;
+
+        renderQueue();
+    }
+
+    function addPatient() {
+        var input = document.getElementById('patientNameInput');
+        var name = input.value.trim();
+        if (!name) {
+            showToast('请输入患者姓名');
+            return;
+        }
+        numCounter++;
+        var num = 'A' + String(numCounter).padStart(3, '0');
+        queue.push({
+            name: name,
+            number: num,
+            dept: '全科医学科',
+            room: '第5诊室',
+            status: 'waiting'
+        });
+        input.value = '';
+        showToast('已加入队列：' + name + '（' + num + '）');
+        renderQueue();
+    }
+
+    function renderQueue() {
+        var list = document.getElementById('queueList');
+        var waitingCount = queue.filter(function(p) { return p.status === 'waiting'; }).length;
+        document.getElementById('queueCount').textContent = waitingCount + ' 人等待';
+
+        var items = queue.filter(function(p) { return p.status !== 'done'; });
+        if (items.length === 0) {
+            list.innerHTML = '<li style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 14px;">暂无候诊患者，请在上方添加</li>';
+            return;
+        }
+
+        list.innerHTML = items.map(function(p) {
+            var cls = 'queue-item';
+            var statusCls = 'queue-item-status waiting';
+            var statusText = '等候中';
+            if (p.status === 'current') {
+                cls += ' current';
+                statusCls = 'queue-item-status current';
+                statusText = '就诊中';
+            }
+            return '<li class="' + cls + '">' +
+                '<div class="queue-item-num">' + p.number + '</div>' +
+                '<div class="queue-item-info">' +
+                    '<div class="queue-item-name">' + p.name + '</div>' +
+                    '<div class="queue-item-detail">' + p.dept + ' / ' + p.room + '</div>' +
+                '</div>' +
+                '<span class="' + statusCls + '">' + statusText + '</span>' +
+            '</li>';
+        }).join('');
+    }
+
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function() {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    renderQueue();
 </script>
 
 </body>
