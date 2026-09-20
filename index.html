@@ -612,6 +612,253 @@
             line-height: 1.6;
         }
 
+        /* ===== Registration Section ===== */
+        .reg-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .reg-option {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reg-option:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .reg-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .reg-option.selected::after {
+            content: "\2713";
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .reg-option-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--primary-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            transition: background 0.3s ease;
+        }
+
+        .reg-option.selected .reg-option-icon {
+            background: var(--primary);
+        }
+
+        .reg-option-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--primary);
+            transition: fill 0.3s ease;
+        }
+
+        .reg-option.selected .reg-option-icon svg {
+            fill: #FFFFFF;
+        }
+
+        .reg-option h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .reg-option p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .reg-option .reg-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 8px;
+        }
+
+        .reg-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.25s ease;
+        }
+
+        .reg-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .reg-btn:disabled {
+            background: var(--border);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* ===== Statistics ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .stat-trend {
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .stat-trend.up {
+            color: var(--success);
+        }
+
+        .stat-trend.down {
+            color: var(--text-muted);
+        }
+
+        /* Bar chart */
+        .bar-chart {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .bar-chart h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .bar-label {
+            width: 90px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 28px;
+            background: var(--bg);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .bar-fill-1 { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+        .bar-fill-2 { background: linear-gradient(90deg, #36C5B0, #4AD9C4); }
+        .bar-fill-3 { background: linear-gradient(90deg, #E67E22, #F39C12); }
+        .bar-fill-4 { background: linear-gradient(90deg, #9B59B6, #BB6BD9); }
+
+        .reg-result {
+            display: none;
+            background: var(--success-soft);
+            border: 1px solid var(--success);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-top: 16px;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .reg-result.show {
+            display: flex;
+        }
+
+        .reg-result svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--success);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .reg-result-text {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .reg-result-text strong {
+            color: var(--success);
+        }
+
         /* ===== Responsive ===== */
         @media (max-width: 640px) {
             .nav-links {
@@ -680,6 +927,35 @@
                 padding: 8px;
                 font-size: 13px;
             }
+
+            .reg-options {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .reg-option {
+                padding: 16px 12px;
+            }
+
+            .reg-option .reg-price {
+                font-size: 16px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .bar-chart {
+                padding: 20px;
+            }
+
+            .bar-label {
+                width: 70px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -691,6 +967,7 @@
         <ul class="nav-links" id="navLinks">
             <li><a href="#home" class="active">首页</a></li>
             <li><a href="#guide">患者指南</a></li>
+            <li><a href="#register">门诊挂号</a></li>
             <li><a href="#appointment">预约联系</a></li>
         </ul>
         <button class="nav-toggle" id="navToggle" aria-label="菜单">
@@ -833,6 +1110,133 @@
                     <div class="faq-answer">
                         <p>门诊周六上午正常开诊，周六下午及周日全天休息。法定节假日门诊安排请关注医院公众号通知。急诊24小时开放，如有紧急情况请直接前往急诊科就诊。</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Registration ===== -->
+    <section id="register">
+        <h2 class="section-title">门诊挂号</h2>
+        <p class="section-subtitle">请选择您需要的门诊类型，一键挂号方便快捷</p>
+
+        <div class="reg-options" id="regOptions">
+            <div class="reg-option" data-type="普通门诊" data-fee="25" data-wait="约15分钟" data-count="86">
+                <div class="reg-option-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-4v-3H7v-4h3V7h4v3h3v4z"/></svg>
+                </div>
+                <h3>普通门诊</h3>
+                <p>常见病、慢性病复诊</p>
+                <div class="reg-price">&yen;25</div>
+            </div>
+            <div class="reg-option" data-type="专家门诊" data-fee="80" data-wait="约40分钟" data-count="42">
+                <div class="reg-option-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h3>专家门诊</h3>
+                <p>疑难杂症、专科诊疗</p>
+                <div class="reg-price">&yen;80</div>
+            </div>
+            <div class="reg-option" data-type="急诊" data-fee="50" data-wait="随到随看" data-count="23">
+                <div class="reg-option-icon">
+                    <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 10 16.8 11 19 11v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.56-.89-1.5-1.4-2.5-1.4-.34 0-.69.07-1.03.21L4 8.1V13h2V9.2l1.8-.9"/></svg>
+                </div>
+                <h3>急诊</h3>
+                <p>24小时随到随看</p>
+                <div class="reg-price">&yen;50</div>
+            </div>
+            <div class="reg-option" data-type="特需门诊" data-fee="200" data-wait="约10分钟" data-count="12">
+                <div class="reg-option-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                </div>
+                <h3>特需门诊</h3>
+                <p>优先就诊、专属服务</p>
+                <div class="reg-price">&yen;200</div>
+            </div>
+        </div>
+
+        <button class="reg-btn" id="regBtn" disabled>请先选择门诊类型</button>
+
+        <div class="reg-result" id="regResult">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <div class="reg-result-text" id="regResultText"></div>
+        </div>
+
+        <!-- Statistics -->
+        <div style="margin-top: 40px;">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: var(--text);">今日挂号统计</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotal">163</div>
+                    <div class="stat-label">今日挂号总数</div>
+                    <div class="stat-trend up">&#9650; 12.4% 较昨日</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">当前等候人数</div>
+                    <div class="stat-trend down">&#9660; 5人 减少</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">18<span style="font-size: 16px;">min</span></div>
+                    <div class="stat-label">平均等候时间</div>
+                    <div class="stat-trend up">&#9650; 缩短3分钟</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">94%</div>
+                    <div class="stat-label">今日满意度</div>
+                    <div class="stat-trend up">&#9650; 2.1% 提升</div>
+                </div>
+            </div>
+
+            <div class="bar-chart">
+                <h3>各门诊类型挂号分布（今日）</h3>
+                <div class="bar-row">
+                    <span class="bar-label">普通门诊</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 86%;" data-target="86">86人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">专家门诊</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-2" style="width: 42%;" data-target="42">42人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">急诊</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-3" style="width: 23%;" data-target="23">23人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">特需门诊</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-4" style="width: 12%;" data-target="12">12人</div></div>
+                </div>
+            </div>
+
+            <div class="bar-chart" style="margin-top: 16px;">
+                <h3>近7日挂号趋势</h3>
+                <div class="bar-row">
+                    <span class="bar-label">9月14日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 70%;">128人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月15日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 52%;">95人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月16日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 38%;">69人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月17日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 85%;">155人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月18日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 88%;">160人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月19日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 82%;">149人</div></div>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">9月20日</span>
+                    <div class="bar-track"><div class="bar-fill bar-fill-1" style="width: 90%; background: linear-gradient(90deg, var(--primary-hover), var(--primary));">163人</div></div>
                 </div>
             </div>
         </div>
@@ -1040,6 +1444,63 @@
             item.classList.add('open');
         }
     }
+
+    // Registration module
+    (function() {
+        var options = document.querySelectorAll('.reg-option');
+        var regBtn = document.getElementById('regBtn');
+        var regResult = document.getElementById('regResult');
+        var regResultText = document.getElementById('regResultText');
+        var statTotal = document.getElementById('statTotal');
+        var selectedType = null;
+        var selectedEl = null;
+
+        options.forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                options.forEach(function(o) { o.classList.remove('selected'); });
+                opt.classList.add('selected');
+                selectedType = opt.dataset.type;
+                selectedEl = opt;
+                regBtn.disabled = false;
+                regBtn.textContent = '确认挂号 — ' + selectedType;
+            });
+        });
+
+        regBtn.addEventListener('click', function() {
+            if (!selectedType || !selectedEl) return;
+
+            var fee = selectedEl.dataset.fee;
+            var wait = selectedEl.dataset.wait;
+            var now = new Date();
+            var h = now.getHours();
+            var m = String(now.getMinutes()).padStart(2, '0');
+            var queueNo = 'A' + (100 + Math.floor(Math.random() * 900));
+            var docName = '小包医生';
+
+            regResultText.innerHTML =
+                '<strong>挂号成功！</strong><br>' +
+                '门诊类型：' + selectedType + ' | 挂号费：&yen;' + fee + '<br>' +
+                '就诊医生：' + docName + ' | 预计等候：' + wait + '<br>' +
+                '挂号时间：' + h + ':' + m + ' | 待叫号：' + queueNo;
+            regResult.classList.add('show');
+
+            // Update total count
+            var currentTotal = parseInt(statTotal.textContent) || 0;
+            statTotal.textContent = currentTotal + 1;
+
+            // Update the bar for this type
+            var bars = document.querySelectorAll('.bar-fill[data-target]');
+            bars.forEach(function(bar) {
+                if (bar.parentElement.previousElementSibling &&
+                    bar.parentElement.previousElementSibling.textContent.indexOf(selectedType) !== -1) {
+                    var val = parseInt(bar.dataset.target) + 1;
+                    bar.dataset.target = val;
+                    bar.style.width = Math.min(val, 100) + '%';
+                    bar.textContent = val + '人';
+                }
+            });
+        });
+    })();
 </script>
 
 </body>
