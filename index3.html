@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧停车场实时监控 | Smart Parking Monitor</title>
+    <style>
+        :root {
+            --primary: #4A90D9;
+            --primary-light: #5B8DEF;
+            --primary-soft: #EBF3FC;
+            --primary-hover: #3A7BC8;
+            --bg: #F0F4F8;
+            --surface: #FFFFFF;
+            --text: #2C3E50;
+            --text-secondary: #5A6C7D;
+            --text-muted: #95A5B7;
+            --border: #DDE4EB;
+            --success: #27AE60;
+            --success-soft: #E8F8EF;
+            --warning: #E67E22;
+            --warning-soft: #FDF0E6;
+            --danger: #E74C3C;
+            --danger-soft: #FDEAE8;
+            --gold: #F1C40F;
+            --shadow: 0 2px 12px rgba(0,0,0,0.06);
+            --shadow-hover: 0 6px 24px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app { max-width: 1280px; margin: 0 auto; padding: 16px; }
+
+        /* ===== Header ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+
+        .logo {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(74,144,217,0.3);
+        }
+        .logo svg { width: 28px; height: 28px; fill: #fff; }
+
+        .header h1 { font-size: 22px; font-weight: 800; color: var(--text); }
+        .header .sub { font-size: 13px; color: var(--text-muted); }
+
+        .header-right { display: flex; align-items: center; gap: 16px; }
+
+        .clock-box {
+            text-align: right;
+        }
+        .clock-time { font-size: 22px; font-weight: 700; color: var(--primary); font-variant-numeric: tabular-nums; }
+        .clock-date { font-size: 12px; color: var(--text-muted); }
+
+        .status-dot {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 600; color: var(--success);
+        }
+        .status-dot::before {
+            content: ''; width: 8px; height: 8px; border-radius: 50%;
+            background: var(--success);
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        /* ===== Stats Row ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+        }
+        .stat-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+        .stat-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .stat-icon svg { width: 22px; height: 22px; }
+        .stat-icon.blue { background: var(--primary-soft); }
+        .stat-icon.blue svg { fill: var(--primary); }
+        .stat-icon.green { background: var(--success-soft); }
+        .stat-icon.green svg { fill: var(--success); }
+        .stat-icon.orange { background: var(--warning-soft); }
+        .stat-icon.orange svg { fill: var(--warning); }
+        .stat-icon.red { background: var(--danger-soft); }
+        .stat-icon.red svg { fill: var(--danger); }
+        .stat-icon.gold { background: #FEF9E7; }
+        .stat-icon.gold svg { fill: var(--gold); }
+
+        .stat-info { flex: 1; min-width: 0; }
+        .stat-val { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.1; }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== Main Layout ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== Parking Map ===== */
+        .map-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .map-card h2 {
+            font-size: 17px; font-weight: 700; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .map-card h2 svg { width: 20px; height: 20px; fill: var(--primary); }
+        .map-card .map-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+
+        .lot-container {
+            background: #ECEFF1;
+            border-radius: var(--radius-sm);
+            padding: 24px 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lot-entrance {
+            position: absolute;
+            top: 8px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 14px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .lot-exit {
+            position: absolute;
+            bottom: 8px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 14px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .lot-arrow {
+            position: absolute;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .parking-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 28px;
+            margin-bottom: 28px;
+        }
+
+        .park-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .lane-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            width: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .park-lane {
+            background: #CFD8DC;
+            height: 20px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #78909C;
+            margin: 0 4px;
+            min-width: 60px;
+        }
+
+        .spot {
+            width: 44px;
+            height: 60px;
+            border-radius: 4px;
+            border: 2px dashed transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .spot.free {
+            background: var(--success-soft);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .spot.occupied {
+            background: var(--danger-soft);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .spot.reserved {
+            background: var(--warning-soft);
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .spot:hover {
+            transform: scale(1.12);
+            z-index: 5;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .spot .car-icon {
+            font-size: 18px;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .spot.pulse {
+            animation: spotPulse 0.6s ease 3;
+        }
+        @keyframes spotPulse {
+            50% { transform: scale(1.2); box-shadow: 0 0 20px var(--success); }
+        }
+
+        /* Spot tooltip */
+        .spot-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+        .spot:hover .spot-tooltip { opacity: 1; }
+        .spot-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: var(--text);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
+        .legend-dot.free { background: var(--success-soft); border: 2px solid var(--success); }
+        .legend-dot.occupied { background: var(--danger-soft); border: 2px solid var(--danger); }
+        .legend-dot.reserved { background: var(--warning-soft); border: 2px solid var(--warning); }
+
+        /* ===== Right Panel ===== */
+        .right-panel { display: flex; flex-direction: column; gap: 16px; }
+
+        .panel-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .panel-card h2 {
+            font-size: 16px; font-weight: 700; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .panel-card h2 svg { width: 18px; height: 18px; fill: var(--primary); }
+        .panel-card h2 .badge {
+            margin-left: auto; font-size: 11px; padding: 2px 8px;
+            border-radius: 10px; background: var(--primary-soft); color: var(--primary);
+        }
+
+        /* Revenue */
+        .revenue-display {
+            text-align: center;
+            padding: 12px 0 8px;
+        }
+        .revenue-total {
+            font-size: 32px; font-weight: 800; color: var(--success);
+        }
+        .revenue-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .revenue-row {
+            display: flex; justify-content: space-between;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .revenue-row:last-child { border-bottom: none; }
+        .revenue-row .label { color: var(--text-secondary); }
+        .revenue-row .val { font-weight: 700; color: var(--text); }
+
+        /* Activity log */
+        .activity-log {
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .activity-log::-webkit-scrollbar { width: 4px; }
+        .activity-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .log-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            animation: logSlide 0.3s ease;
+        }
+        @keyframes logSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-item.entry { background: var(--success-soft); }
+        .log-item.exit { background: var(--warning-soft); }
+        .log-item.alert { background: var(--danger-soft); }
+        .log-item.info { background: var(--primary-soft); }
+
+        .log-icon {
+            width: 24px; height: 24px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; font-size: 12px;
+        }
+        .log-icon.entry { background: var(--success); color: #fff; }
+        .log-icon.exit { background: var(--warning); color: #fff; }
+        .log-icon.alert { background: var(--danger); color: #fff; }
+        .log-icon.info { background: var(--primary); color: #fff; }
+
+        .log-content { flex: 1; min-width: 0; }
+        .log-text { color: var(--text); font-weight: 500; line-height: 1.4; }
+        .log-time { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+        /* Vehicle list */
+        .vehicle-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .vehicle-list::-webkit-scrollbar { width: 4px; }
+        .vehicle-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .vehicle-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+        .vehicle-item:hover { border-color: var(--primary); }
+
+        .vehicle-plate {
+            background: var(--text);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            min-width: 70px;
+            text-align: center;
+        }
+        .vehicle-plate.new-energy {
+            background: var(--success);
+        }
+
+        .vehicle-info { flex: 1; min-width: 0; }
+        .vehicle-spot { font-size: 13px; font-weight: 600; color: var(--text); }
+        .vehicle-time { font-size: 11px; color: var(--text-muted); }
+
+        .vehicle-fee {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .vehicle-fee-val { font-size: 14px; font-weight: 700; color: var(--danger); }
+        .vehicle-fee-label { font-size: 10px; color: var(--text-muted); }
+
+        /* ===== Bottom Bar ===== */
+        .bottom-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .rate-card .rate-row {
+            display: flex; justify-content: space-between;
+            padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--border);
+        }
+        .rate-card .rate-row:last-child { border-bottom: none; }
+        .rate-card .rate-row .val { font-weight: 700; color: var(--primary); }
+
+        /* Controls */
+        .ctrl-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .ctrl-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ctrl-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .ctrl-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .ctrl-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 80px; left: 50%;
+            transform: translateX(-50%) translateY(-120%);
+            background: var(--text);
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            z-index: 500;
+            transition: transform 0.4s ease;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast .toast-icon { font-size: 20px; }
+
+        /* Gauge */
+        .gauge-wrap {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .gauge {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        .gauge svg { transform: rotate(-90deg); }
+        .gauge-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+        .gauge-fill { fill: none; stroke: var(--primary); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .gauge-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .gauge-val { font-size: 28px; font-weight: 800; color: var(--text); }
+        .gauge-label { font-size: 11px; color: var(--text-muted); }
+
+        /* Occupancy bar chart */
+        .occ-bars { display: flex; gap: 6px; align-items: flex-end; height: 60px; margin-top: 8px; }
+        .occ-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+            position: relative;
+            min-height: 4px;
+        }
+        .occ-bar-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 960px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .bottom-bar { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .spot { width: 36px; height: 50px; }
+            .header h1 { font-size: 18px; }
+            .clock-time { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5h11L19 11M17.5 16a1.5 1.5 0 01-1.5-1.5 1.5 1.5 0 011.5-1.5 1.5 1.5 0 011.5 1.5 1.5 1.5 0 01-1.5 1.5m-11 0A1.5 1.5 0 015 14.5 1.5 1.5 0 016.5 13a1.5 1.5 0 011.5 1.5A1.5 1.5 0 016.5 16m4.5-9H7.5L6 11h12l-1.5-4M18.92 6c-.2-.58-.76-1-1.42-1h-11c-.66 0-1.21.42-1.42 1L3 12v8a1 1 0 001 1h1a1 1 0 001-1v-1h12v1a1 1 0 001 1h1a1 1 0 001-1v-8l-2.08-6z"/></svg>
+            </div>
+            <div>
+                <h1>智慧停车场实时监控</h1>
+                <div class="sub">XBAOS智能停车管理系统 &middot; 地下车库B1层</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="status-dot">系统运行中</div>
+            <div class="clock-box">
+                <div class="clock-time" id="clockTime">00:00:00</div>
+                <div class="clock-date" id="clockDate">2026年9月20日</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5h11L19 11M17.5 16a1.5 1.5 0 01-1.5-1.5 1.5 1.5 0 011.5-1.5 1.5 1.5 0 011.5 1.5 1.5 1.5 0 01-1.5 1.5m-11 0A1.5 1.5 0 015 14.5 1.5 1.5 0 016.5 13a1.5 1.5 0 011.5 1.5A1.5 1.5 0 016.5 16m4.5-9H7.5L6 11h12l-1.5-4"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="statTotal">40</div><div class="stat-label">总车位</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="statFree">0</div><div class="stat-label">空余车位</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="statOccupied">0</div><div class="stat-label">已占用车位</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="statFlow">0</div><div class="stat-label">今日车流量</div></div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-icon gold"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <div class="stat-info"><div class="stat-val" id="statRevenue">&#65509;0</div><div class="stat-label">今日收入</div></div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+        <!-- Parking Map -->
+        <div class="map-card">
+            <h2>
+                <svg viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3M3 5v2h13V5H3m0 6v2h13v-2H3m10 6v2h5v-2h-5z"/></svg>
+                车位平面图
+                <span class="badge" id="occupancyRate">0%</span>
+            </h2>
+            <div class="map-sub">点击车位查看详情 &middot; 绿=空闲 红=占用 橙=预留</div>
+
+            <div class="lot-container">
+                <div class="lot-entrance">&#8595; 入口闸机</div>
+                <div class="lot-exit">&#8593; 出口闸机</div>
+
+                <div class="parking-area" id="parkingArea"></div>
+
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot free"></span>空闲</div>
+                    <div class="legend-item"><span class="legend-dot occupied"></span>占用</div>
+                    <div class="legend-item"><span class="legend-dot reserved"></span>预留</div>
+                </div>
+            </div>
+
+            <div class="ctrl-bar">
+                <button class="ctrl-btn active" id="autoBtn" onclick="toggleAuto()">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    自动模拟
+                </button>
+                <button class="ctrl-btn" onclick="simulateEntry()">
+                    <svg viewBox="0 0 24 24"><path d="M19 3h-4v2h4v14h-4v2h6V3zm-6 16v-2H7V5h6V3H5v18z"/></svg>
+                    模拟车辆进入
+                </button>
+                <button class="ctrl-btn" onclick="simulateExit()">
+                    <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4v18h8v-2H4z"/></svg>
+                    模拟车辆离开
+                </button>
+                <button class="ctrl-btn" onclick="toggleVoice()" id="voiceBtn">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                    语音播报
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+            <!-- Occupancy Gauge -->
+            <div class="panel-card">
+                <h2>占用率</h2>
+                <div class="gauge-wrap">
+                    <div class="gauge">
+                        <svg width="120" height="120">
+                            <circle class="gauge-bg" cx="60" cy="60" r="50" />
+                            <circle class="gauge-fill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314" id="gaugeFill" />
+                        </svg>
+                        <div class="gauge-text">
+                            <div class="gauge-val" id="gaugeVal">0%</div>
+                            <div class="gauge-label">实时占用</div>
+                        </div>
+                    </div>
+                    <div class="occ-bars" id="occBars"></div>
+                </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="panel-card">
+                <h2>今日营收</h2>
+                <div class="revenue-display">
+                    <div class="revenue-total" id="revTotal">&#65509;0</div>
+                    <div class="revenue-label">累计收入</div>
+                </div>
+                <div class="revenue-row"><span class="label">现金支付</span><span class="val" id="revCash">&#65509;0</span></div>
+                <div class="revenue-row"><span class="label">电子支付</span><span class="val" id="revElec">&#65509;0</span></div>
+                <div class="revenue-row"><span class="label">月卡车辆</span><span class="val" id="revMonth">&#65509;0</span></div>
+                <div class="revenue-row"><span class="label">免费车辆</span><span class="val" id="revFree">0辆</span></div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="panel-card">
+                <h2>实时动态 <span class="badge" id="logCount">0</span></h2>
+                <div class="activity-log" id="activityLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <!-- Vehicle List -->
+        <div class="panel-card">
+            <h2>在场车辆 <span class="badge" id="vehicleCount">0</span></h2>
+            <div class="vehicle-list" id="vehicleList">
+                <div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">暂无在场车辆</div>
+            </div>
+        </div>
+
+        <!-- Rate Info -->
+        <div class="panel-card rate-card">
+            <h2>收费标准</h2>
+            <div class="rate-row"><span>首2小时</span><span class="val">&#65509;5/小时</span></div>
+            <div class="rate-row"><span>2-6小时</span><span class="val">&#65509;3/小时</span></div>
+            <div class="rate-row"><span>6-24小时</span><span class="val">&#65509;2/小时</span></div>
+            <div class="rate-row"><span>24小时封顶</span><span class="val">&#65509;35</span></div>
+            <div class="rate-row"><span>新能源车</span><span class="val">8折优惠</span></div>
+            <div class="rate-row"><span>月卡会员</span><span class="val">&#65509;300/月</span></div>
+            <div class="rate-row"><span>免费时长</span><span class="val">15分钟内</span></div>
+        </div>
+
+        <!-- Hourly Stats -->
+        <div class="panel-card">
+            <h2>时段车流统计</h2>
+            <div class="occ-bars" id="hourlyBars" style="height:100px"></div>
+            <div id="hourlyLabels" style="display:flex;gap:6px;margin-top:4px"></div>
+            <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.6">
+                <div>&#128200; 高峰时段：10:00-12:00, 17:00-19:00</div>
+                <div>&#128202; 今日峰值：<span id="peakHour" style="font-weight:700;color:var(--primary)">--</span></div>
+                <div>&#128663; 平均停留时长：<span id="avgDuration" style="font-weight:700;color:var(--primary)">--分钟</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==============================================
+// 智慧停车场实时监控系统
+// ==============================================
+
+// === Config ===
+var ROWS = 5;
+var COLS = 8;
+var TOTAL_SPOTS = ROWS * COLS;
+var PRICE_TIER1 = 5;  // 0-2h
+var PRICE_TIER2 = 3;  // 2-6h
+var PRICE_TIER3 = 2;  // 6-24h
+var MAX_DAILY = 35;
+
+// === State ===
+var spots = [];
+var vehicles = {};
+var logs = [];
+var todayRevenue = { total: 0, cash: 0, elec: 0, month: 0, free: 0 };
+var todayFlow = 0;
+var autoMode = true;
+var voiceEnabled = true;
+var simTimer = null;
+var audioCtx = null;
+var hourlyData = [0,0,0,0,0,0,0,3,8,12,15,18,14,10,8,10,13,16,12,8,5,3,2,1];
+
+// === Init Spots ===
+function initSpots() {
+    spots = [];
+    for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+            var id = 'A' + (r + 1) + '-' + (c + 1);
+            spots.push({
+                id: id, row: r, col: c,
+                status: 'free',
+                vehicle: null,
+                entryTime: null
+            });
+        }
+    }
+    // Pre-occupy some spots
+    var presetCount = 12;
+    var indices = [];
+    while (indices.length < presetCount) {
+        var idx = Math.floor(Math.random() * TOTAL_SPOTS);
+        if (indices.indexOf(idx) === -1) indices.push(idx);
+    }
+    indices.forEach(function(idx) {
+        occupySpot(idx, generatePlate(), null, true);
+    });
+    // Reserve 2 spots
+    for (var k = 0; k < 2; k++) {
+        var rIdx;
+        do { rIdx = Math.floor(Math.random() * TOTAL_SPOTS); } while (spots[rIdx].status !== 'free');
+        spots[rIdx].status = 'reserved';
+    }
+}
+
+// === Vehicle plate generator ===
+var provinces = ['京','沪','粤','苏','浙','川','鲁','豫','陕','渝'];
+var letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+function generatePlate() {
+    var p = provinces[Math.floor(Math.random() * provinces.length)];
+    var l = letters[Math.floor(Math.random() * letters.length)];
+    var num = '';
+    for (var i = 0; i < 5; i++) {
+        num += Math.random() < 0.4 ? letters[Math.floor(Math.random() * letters.length)] : String(Math.floor(Math.random() * 10));
+    }
+    return p + l + num;
+}
+
+function isEnergyPlate(plate) {
+    // Simplified: some plates marked as new energy
+    return plate.indexOf('D') === 1 || plate.indexOf('F') === 1;
+}
+
+// === Occupy / Free Spot ===
+function occupySpot(idx, plate, entryTime, silent) {
+    var s = spots[idx];
+    s.status = 'occupied';
+    s.vehicle = plate;
+    s.entryTime = entryTime || new Date();
+    vehicles[plate] = { spot: s.id, entryTime: s.entryTime, plate: plate, energy: isEnergyPlate(plate) };
+    todayFlow++;
+    if (!silent) {
+        addLog('entry', '车辆 ' + plate + ' 进入停车场，停放至 ' + s.id + ' 号车位');
+        showToast('车辆进入: ' + plate + ' → ' + s.id, '&#128663;');
+        speak('车辆' + plate + '进入停车场，停放在' + s.id + '号车位');
+        playChime();
+    }
+}
+
+function freeSpot(idx, silent) {
+    var s = spots[idx];
+    if (s.status !== 'occupied') return;
+    var plate = s.vehicle;
+    var fee = calculateFee(s.entryTime, vehicles[plate] ? vehicles[plate].energy : false);
+    var duration = Math.floor((new Date() - s.entryTime) / 60000);
+
+    s.status = 'free';
+    s.vehicle = null;
+    s.entryTime = null;
+
+    if (vehicles[plate]) delete vehicles[plate];
+
+    // Revenue
+    if (fee > 0) {
+        var payMethod = Math.random() < 0.7 ? 'elec' : 'cash';
+        todayRevenue.total += fee;
+        todayRevenue[payMethod] += fee;
+    } else {
+        todayRevenue.free++;
+    }
+
+    if (!silent) {
+        var durStr = duration < 60 ? duration + '分钟' : Math.floor(duration/60) + '小时' + (duration%60) + '分';
+        addLog('exit', '车辆 ' + plate + ' 从 ' + s.id + ' 离开，停留' + durStr + '，收费' + (fee > 0 ? '￥' + fee : '免费'));
+        showToast('车辆离开: ' + plate + ' 收费￥' + fee, '&#128664;');
+        speak('车辆' + plate + '离开' + s.id + '号车位，收费' + (fee > 0 ? fee + '元' : '免费') + '，停留' + durStr);
+        playChime();
+    }
+}
+
+// === Fee Calculator ===
+function calculateFee(entryTime, isEnergy) {
+    var minutes = Math.floor((new Date() - entryTime) / 60000);
+    if (minutes <= 15) return 0;
+    var hours = minutes / 60;
+    var fee = 0;
+    if (hours <= 2) {
+        fee = Math.ceil(hours * PRICE_TIER1);
+    } else if (hours <= 6) {
+        fee = 10 + Math.ceil((hours - 2) * PRICE_TIER2);
+    } else {
+        fee = 10 + 12 + Math.ceil((hours - 6) * PRICE_TIER3);
+    }
+    if (fee > MAX_DAILY) fee = MAX_DAILY;
+    if (isEnergy) fee = Math.round(fee * 0.8);
+    return fee;
+}
+
+// === Render Parking Map ===
+function renderMap() {
+    var area = document.getElementById('parkingArea');
+    area.innerHTML = '';
+
+    for (var r = 0; r < ROWS; r++) {
+        var row = document.createElement('div');
+        row.className = 'park-row';
+
+        var label = document.createElement('div');
+        label.className = 'lane-label';
+        label.textContent = (r + 1) + '排';
+        row.appendChild(label);
+
+        for (var c = 0; c < COLS; c++) {
+            var idx = r * COLS + c;
+            var s = spots[idx];
+            var div = document.createElement('div');
+            div.className = 'spot ' + s.status;
+            div.dataset.idx = idx;
+
+            var carIcon = s.status === 'occupied' ? '<div class="car-icon">&#128663;</div>' : '';
+            var tooltip = '';
+            if (s.status === 'occupied' && s.vehicle) {
+                var fee = calculateFee(s.entryTime, vehicles[s.vehicle] ? vehicles[s.vehicle].energy : false);
+                tooltip = s.vehicle + ' | ' + formatDuration(s.entryTime) + ' | ￥' + fee;
+            } else if (s.status === 'reserved') {
+                tooltip = '已预留';
+            } else {
+                tooltip = '空闲车位';
+            }
+
+            div.innerHTML = carIcon + '<div>' + s.id + '</div>' +
+                '<div class="spot-tooltip">' + tooltip + '</div>';
+            div.onclick = function() { spotClick(this.dataset.idx); };
+            row.appendChild(div);
+
+            // Add lane between spots (every 4 cols)
+            if (c === 3 || c === 7) {
+                var lane = document.createElement('div');
+                lane.className = 'park-lane';
+                lane.textContent = '车道';
+                row.appendChild(lane);
+            }
+        }
+
+        area.appendChild(row);
+
+        // Add driving lane between rows
+        if (r < ROWS - 1) {
+            var dLane = document.createElement('div');
+            dLane.style.cssText = 'width:90%;height:18px;background:#B0BEC5;border-radius:3px;margin:2px auto;display:flex;align-items:center;justify-content:center;font-size:9px;color:#607D8B';
+            dLane.textContent = '&#8592; 行车通道 &#8594;';
+            area.appendChild(dLane);
+        }
+    }
+}
+
+function spotClick(idx) {
+    var s = spots[idx];
+    if (s.status === 'occupied') {
+        var fee = calculateFee(s.entryTime, vehicles[s.vehicle] ? vehicles[s.vehicle].energy : false);
+        var dur = formatDuration(s.entryTime);
+        var info = s.id + ' | ' + s.vehicle + ' | 停留' + dur + ' | 当前费用￥' + fee;
+        showToast(info, '&#9432;');
+        speak(s.vehicle + '停在' + s.id + '号车位，停留' + dur + '，当前费用' + fee + '元');
+    } else if (s.status === 'free') {
+        showToast(s.id + ' 号车位空闲，可直接停放', '&#9989;');
+        speak(s.id + '号车位空闲');
+    } else {
+        showToast(s.id + ' 号车位已预留', '&#9888;');
+    }
+}
+
+function formatDuration(entryTime) {
+    var mins = Math.floor((new Date() - entryTime) / 60000);
+    if (mins < 60) return mins + '分';
+    return Math.floor(mins/60) + '时' + (mins%60) + '分';
+}
+
+// === Stats ===
+function updateStats() {
+    var free = 0, occupied = 0, reserved = 0;
+    spots.forEach(function(s) {
+        if (s.status === 'free') free++;
+        else if (s.status === 'occupied') occupied++;
+        else reserved++;
+    });
+
+    document.getElementById('statTotal').textContent = TOTAL_SPOTS;
+    document.getElementById('statFree').textContent = free;
+    document.getElementById('statOccupied').textContent = occupied;
+    document.getElementById('statFlow').textContent = todayFlow;
+    document.getElementById('statRevenue').innerHTML = '&#65509;' + todayRevenue.total;
+    document.getElementById('occupancyRate').textContent = Math.round(occupied / TOTAL_SPOTS * 100) + '%';
+
+    // Gauge
+    var pct = occupied / TOTAL_SPOTS;
+    var offset = 314 * (1 - pct);
+    document.getElementById('gaugeFill').setAttribute('stroke-dashoffset', offset);
+    document.getElementById('gaugeVal').textContent = Math.round(pct * 100) + '%';
+
+    // Revenue
+    document.getElementById('revTotal').innerHTML = '&#65509;' + todayRevenue.total;
+    document.getElementById('revCash').innerHTML = '&#65509;' + todayRevenue.cash;
+    document.getElementById('revElec').innerHTML = '&#65509;' + todayRevenue.elec;
+    document.getElementById('revMonth').innerHTML = '&#65509;0';
+    document.getElementById('revFree').textContent = todayRevenue.free + '辆';
+
+    // Occupancy bars (per row)
+    var occBars = document.getElementById('occBars');
+    occBars.innerHTML = '';
+    for (var r = 0; r < ROWS; r++) {
+        var count = 0;
+        for (var c = 0; c < COLS; c++) {
+            if (spots[r * COLS + c].status === 'occupied') count++;
+        }
+        var h = (count / COLS) * 60;
+        var bar = document.createElement('div');
+        bar.className = 'occ-bar';
+        bar.style.height = Math.max(h, 4) + 'px';
+        bar.style.background = count >= 6 ? 'var(--danger)' : count >= 3 ? 'var(--warning)' : 'var(--success)';
+        bar.title = (r+1) + '排: ' + count + '/' + COLS;
+        occBars.appendChild(bar);
+    }
+
+    // Hourly bars
+    var hourlyBars = document.getElementById('hourlyBars');
+    var hourlyLabels = document.getElementById('hourlyLabels');
+    hourlyBars.innerHTML = '';
+    hourlyLabels.innerHTML = '';
+    var maxVal = Math.max.apply(null, hourlyData);
+    var currentHour = new Date().getHours();
+    for (var h2 = 0; h2 < 24; h2++) {
+        var hb = document.createElement('div');
+        hb.className = 'occ-bar';
+        hb.style.height = Math.max((hourlyData[h2] / maxVal) * 100, 4) + 'px';
+        hb.style.background = h2 === currentHour ? 'var(--primary)' : (hourlyData[h2] >= 10 ? 'var(--danger)' : hourlyData[h2] >= 5 ? 'var(--warning)' : 'var(--success)');
+        hb.title = h2 + ':00 - ' + hourlyData[h2] + '辆';
+        hourlyBars.appendChild(hb);
+
+        if (h2 % 4 === 0) {
+            var hl = document.createElement('div');
+            hl.className = 'occ-bar-label';
+            hl.style.flex = '1';
+            hl.textContent = h2 + '时';
+            hourlyLabels.appendChild(hl);
+        } else {
+            var sp = document.createElement('div');
+            sp.style.flex = '1';
+            hourlyLabels.appendChild(sp);
+        }
+    }
+
+    // Peak hour
+    var peakH = hourlyData.indexOf(Math.max.apply(null, hourlyData));
+    document.getElementById('peakHour').textContent = peakH + ':00 - ' + hourlyData[peakH] + '辆';
+
+    // Avg duration
+    var totalDur = 0, count2 = 0;
+    for (var v in vehicles) {
+        totalDur += Math.floor((new Date() - vehicles[v].entryTime) / 60000);
+        count2++;
+    }
+    var avg = count2 > 0 ? Math.round(totalDur / count2) : 0;
+    document.getElementById('avgDuration').textContent = avg + '分钟';
+}
+
+// === Vehicle List ===
+function renderVehicleList() {
+    var list = document.getElementById('vehicleList');
+    var arr = [];
+    for (var plate in vehicles) {
+        arr.push(vehicles[plate]);
+    }
+
+    document.getElementById('vehicleCount').textContent = arr.length;
+
+    if (arr.length === 0) {
+        list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">暂无在场车辆</div>';
+        return;
+    }
+
+    arr.sort(function(a, b) { return a.entryTime - b.entryTime; });
+
+    list.innerHTML = arr.map(function(v) {
+        var fee = calculateFee(v.entryTime, v.energy);
+        var dur = formatDuration(v.entryTime);
+        var plateClass = v.energy ? 'vehicle-plate new-energy' : 'vehicle-plate';
+        var energyTag = v.energy ? ' <span style="font-size:10px;color:var(--success)">&#9889;新能源</span>' : '';
+        return '<div class="vehicle-item">' +
+            '<div class="' + plateClass + '">' + v.plate + '</div>' +
+            '<div class="vehicle-info">' +
+                '<div class="vehicle-spot">' + v.spot + energyTag + '</div>' +
+                '<div class="vehicle-time">停留 ' + dur + '</div>' +
+            '</div>' +
+            '<div class="vehicle-fee">' +
+                '<div class="vehicle-fee-val">&#65509;' + fee + '</div>' +
+                '<div class="vehicle-fee-label">当前费用</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// === Activity Log ===
+function addLog(type, text) {
+    var time = new Date();
+    var timeStr = String(time.getHours()).padStart(2,'0') + ':' + String(time.getMinutes()).padStart(2,'0') + ':' + String(time.getSeconds()).padStart(2,'0');
+    logs.unshift({ type: type, text: text, time: timeStr });
+    if (logs.length > 50) logs.pop();
+    renderLogs();
+}
+
+function renderLogs() {
+    var el = document.getElementById('activityLog');
+    document.getElementById('logCount').textContent = logs.length;
+
+    if (logs.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">暂无动态</div>';
+        return;
+    }
+
+    var icons = { entry: '&#8595;', exit: '&#8593;', alert: '&#9888;', info: 'i' };
+    el.innerHTML = logs.map(function(l) {
+        return '<div class="log-item ' + l.type + '">' +
+            '<div class="log-icon ' + l.type + '">' + (icons[l.type] || 'i') + '</div>' +
+            '<div class="log-content">' +
+                '<div class="log-text">' + l.text + '</div>' +
+                '<div class="log-time">' + l.time + '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+// === Toast ===
+function showToast(msg, icon) {
+    var t = document.getElementById('toast');
+    t.innerHTML = (icon ? '<span class="toast-icon">' + icon + '</span>' : '') + '<span>' + msg + '</span>';
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function() { t.classList.remove('show'); }, 3500);
+}
+
+// === Audio ===
+function getAudio() {
+    if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { audioCtx = null; }
+    }
+    return audioCtx;
+}
+
+function playChime() {
+    var ctx2 = getAudio();
+    if (!ctx2) return;
+    var now = ctx2.currentTime;
+    [659.25, 783.99, 1046.5].forEach(function(freq, i) {
+        var osc = ctx2.createOscillator();
+        var gain = ctx2.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(ctx2.destination);
+        gain.gain.setValueAtTime(0, now + i * 0.12);
+        gain.gain.linearRampToValueAtTime(0.25, now + i * 0.12 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.35);
+        osc.start(now + i * 0.12);
+        osc.stop(now + i * 0.12 + 0.4);
+    });
+}
+
+function speak(text) {
+    if (!voiceEnabled) return;
+    if ('speechSynthesis' in window) {
+        var utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-CN';
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+    }
+}
+
+// === Clock ===
+function updateClock() {
+    var now = new Date();
+    var h = String(now.getHours()).padStart(2, '0');
+    var m = String(now.getMinutes()).padStart(2, '0');
+    var s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('clockTime').textContent = h + ':' + m + ':' + s;
+
+    var months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    var days = ['日','一','二','三','四','五','六'];
+    document.getElementById('clockDate').textContent =
+        now.getFullYear() + '年' + months[now.getMonth()] + now.getDate() + '日 周' + days[now.getDay()];
+}
+
+// === Simulation ===
+function simulateEntry() {
+    var freeSpots = [];
+    spots.forEach(function(s, i) {
+        if (s.status === 'free') freeSpots.push(i);
+    });
+    if (freeSpots.length === 0) {
+        showToast('停车场已满，无空余车位！', '&#9888;');
+        addLog('alert', '停车场车位已满，入口闸机亮红灯');
+        speak('停车场已满，暂无空余车位');
+        return;
+    }
+    var idx = freeSpots[Math.floor(Math.random() * freeSpots.length)];
+    var plate = generatePlate();
+    occupySpot(idx, plate, new Date(), false);
+
+    // Pulse animation
+    setTimeout(function() {
+        var el = document.querySelector('.spot[data-idx="' + idx + '"]');
+        if (el) el.classList.add('pulse');
+        setTimeout(function() { if (el) el.classList.remove('pulse'); }, 1800);
+    }, 100);
+
+    // Update hourly data
+    var hr = new Date().getHours();
+    hourlyData[hr]++;
+
+    renderAll();
+}
+
+function simulateExit() {
+    var occSpots = [];
+    spots.forEach(function(s, i) {
+        if (s.status === 'occupied') occSpots.push(i);
+    });
+    if (occSpots.length === 0) {
+        showToast('当前无在场车辆', '&#9888;');
+        return;
+    }
+    var idx = occSpots[Math.floor(Math.random() * occSpots.length)];
+    freeSpot(idx, false);
+    renderAll();
+}
+
+function autoSimulate() {
+    var r = Math.random();
+    if (r < 0.55) {
+        simulateEntry();
+    } else if (r < 0.9) {
+        simulateExit();
+    } else {
+        // Status check alert
+        var occCount = spots.filter(function(s) { return s.status === 'occupied'; }).length;
+        var rate = occCount / TOTAL_SPOTS;
+        if (rate > 0.8) {
+            addLog('alert', '警告：停车场占用率超过80%，建议引导车辆至B2层');
+            showToast('占用率告警：' + Math.round(rate*100) + '%', '&#9888;');
+            speak('警告，停车场占用率超过百分之八十');
+            playChime();
+        } else {
+            addLog('info', '系统巡检完成，设备运行正常，当前占用率' + Math.round(rate*100) + '%');
+        }
+    }
+}
+
+function toggleAuto() {
+    autoMode = !autoMode;
+    var btn = document.getElementById('autoBtn');
+    btn.classList.toggle('active', autoMode);
+    btn.innerHTML = autoMode ?
+        '<svg viewBox="0 0 24 24"><path d="M6 6h12v12H6z" fill="none"/></svg>暂停' :
+        '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>自动模拟';
+
+    if (autoMode) {
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>暂停模拟';
+        simTimer = setInterval(autoSimulate, 4000 + Math.random() * 3000);
+    } else {
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>继续模拟';
+        clearInterval(simTimer);
+    }
+}
+
+function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+    var btn = document.getElementById('voiceBtn');
+    btn.classList.toggle('active', voiceEnabled);
+    if (voiceEnabled) {
+        showToast('语音播报已开启', '&#128266;');
+        speak('语音播报已开启');
+    } else {
+        showToast('语音播报已关闭', '&#128263;');
+        window.speechSynthesis.cancel();
+    }
+}
+
+// === Render All ===
+function renderAll() {
+    renderMap();
+    updateStats();
+    renderVehicleList();
+    renderLogs();
+}
+
+// === Init ===
+function init() {
+    initSpots();
+    renderAll();
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Auto-refresh fees every 10s
+    setInterval(function() {
+        renderVehicleList();
+        updateStats();
+    }, 10000);
+
+    // Start auto simulation
+    simTimer = setInterval(autoSimulate, 4000 + Math.random() * 3000);
+
+    addLog('info', '系统启动成功，停车场监控系统已上线');
+    addLog('info', '初始车位状态：' + spots.filter(function(s){return s.status==='occupied'}).length + '个占用，' + spots.filter(function(s){return s.status==='free'}).length + '个空闲，' + spots.filter(function(s){return s.status==='reserved'}).length + '个预留');
+}
+
+init();
+</script>
+
+</body>
+</html>
