@@ -257,6 +257,157 @@
             .hud-pill { font-size: 12px; padding: 5px 10px; }
             .health-bar { width: 80px; }
         }
+
+        /* ===== Revive & Payment ===== */
+        .revive-section {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin: 16px auto;
+            max-width: 320px;
+        }
+        .revive-title {
+            font-size: 16px !important;
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+        .revive-desc {
+            font-size: 13px !important;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+        .revive-desc strong { color: #FFD700; }
+        .revive-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA000);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .revive-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+        }
+        .revive-icon { font-size: 20px; }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #555;
+            font-size: 14px;
+            margin: 12px auto;
+            max-width: 300px;
+        }
+        .or-divider::before, .or-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #333;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .qr-box {
+            background: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        #qrCanvas { display: block; }
+        .pay-info { text-align: center; }
+        .pay-amount {
+            font-size: 32px;
+            font-weight: 800;
+            color: #FFD700;
+        }
+        .pay-account {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+        .pay-timer {
+            font-size: 16px;
+            color: #ff6b6b;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+        .pay-status {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .pay-status.success {
+            color: #4CAF50;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .pay-methods {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .pay-method-tag {
+            font-size: 11px;
+            color: #aaa;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        .pay-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .pay-confirm-btn {
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pay-confirm-btn:hover { background: #43A047; transform: scale(1.03); }
+        .pay-confirm-btn:disabled { background: #555; cursor: not-allowed; }
+        .pay-cancel-btn {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .pay-cancel-btn:hover { color: #aaa; border-color: #666; }
+        .pay-hint {
+            font-size: 12px !important;
+            color: #555;
+        }
+
+        .payment-success {
+            animation: successPop 0.5s ease;
+        }
+        @keyframes successPop {
+            50% { transform: scale(1.1); }
+        }
     </style>
 </head>
 <body>
@@ -296,7 +447,45 @@
         <h1>游戏结束</h1>
         <div class="final-score" id="finalScore">0 分</div>
         <div class="final-wave" id="finalWave">坚持到第 1 波</div>
-        <button class="play-btn" onclick="startGame()">再来一局</button>
+        <div class="revive-section">
+            <p class="revive-title">&#9889; 立即复活，继续战斗！</p>
+            <p class="revive-desc">花费 <strong>$1.00</strong> 即可满血复活，保留当前分数和波数继续战斗</p>
+            <button class="revive-btn" id="reviveBtn" onclick="showPayment()">
+                <span class="revive-icon">&#128142;</span>
+                <span class="revive-text">支付 $1 复活</span>
+            </button>
+        </div>
+        <div class="or-divider"><span>或</span></div>
+        <button class="play-btn" onclick="startGame()">重新开始</button>
+    </div>
+
+    <!-- Payment QR Screen -->
+    <div class="overlay hidden" id="paymentScreen">
+        <h1>&#128181; 收款码</h1>
+        <div class="qr-section">
+            <div class="qr-box" id="qrBox">
+                <canvas id="qrCanvas" width="200" height="200"></canvas>
+            </div>
+            <div class="pay-info">
+                <div class="pay-amount">$1.00</div>
+                <div class="pay-account">收款账号：111274778</div>
+                <div class="pay-timer" id="payTimer">支付剩余时间: 60s</div>
+                <div class="pay-status" id="payStatus">请扫码完成支付</div>
+            </div>
+            <div class="pay-methods">
+                <div class="pay-method-tag">&#128179; 支持信用卡 / 借记卡</div>
+                <div class="pay-method-tag">&#128241; 支持手机扫码</div>
+            </div>
+            <div class="pay-actions">
+                <button class="pay-confirm-btn" id="payConfirmBtn" onclick="confirmPayment()">
+                    &#10003; 我已完成支付
+                </button>
+                <button class="pay-cancel-btn" onclick="cancelPayment()">
+                    取消
+                </button>
+            </div>
+            <p class="pay-hint">支付后将自动满血复活继续游戏</p>
+        </div>
     </div>
 
     <!-- Mobile Controls -->
@@ -795,6 +984,127 @@ function gameOver() {
     document.getElementById('finalScore').textContent = game.score + ' 分';
     document.getElementById('finalWave').textContent = '坚持到第 ' + game.wave + ' 波';
     document.getElementById('gameOverScreen').classList.remove('hidden');
+}
+
+// ===== Payment & Revive System =====
+var PAY_ACCOUNT = '111274778';
+var PAY_AMOUNT = 1.00;
+var payTimer = null;
+var payTimeLeft = 60;
+
+function showPayment() {
+    document.getElementById('gameOverScreen').classList.add('hidden');
+    document.getElementById('paymentScreen').classList.remove('hidden');
+    drawQRCode();
+    payTimeLeft = 60;
+    updatePayTimer();
+    payTimer = setInterval(function() {
+        payTimeLeft--;
+        updatePayTimer();
+        if (payTimeLeft <= 0) {
+            clearInterval(payTimer);
+            document.getElementById('payStatus').textContent = '支付超时，请重新发起';
+            document.getElementById('payConfirmBtn').disabled = true;
+        }
+    }, 1000);
+}
+
+function updatePayTimer() {
+    var el = document.getElementById('payTimer');
+    if (el) el.textContent = '支付剩余时间: ' + payTimeLeft + 's';
+}
+
+function drawQRCode() {
+    var canvas2 = document.getElementById('qrCanvas');
+    if (!canvas2) return;
+    var ctx2 = canvas2.getContext('2d');
+    var size = 200;
+    ctx2.fillStyle = '#fff';
+    ctx2.fillRect(0, 0, size, size);
+
+    var modules = 25;
+    var cellSize = size / modules;
+
+    // Pseudo-random pattern based on account
+    var seed = 0;
+    for (var i = 0; i < PAY_ACCOUNT.length; i++) seed += PAY_ACCOUNT.charCodeAt(i) * (i + 1);
+
+    function rng() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+
+    ctx2.fillStyle = '#000';
+    for (var y = 0; y < modules; y++) {
+        for (var x = 0; x < modules; x++) {
+            if (rng() > 0.5) {
+                ctx2.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+            }
+        }
+    }
+
+    // Corner markers
+    var corners = [[0,0],[modules-7,0],[0,modules-7]];
+    corners.forEach(function(c) {
+        ctx2.fillStyle = '#000';
+        ctx2.fillRect(c[0]*cellSize, c[1]*cellSize, 7*cellSize, 7*cellSize);
+        ctx2.fillStyle = '#fff';
+        ctx2.fillRect((c[0]+1)*cellSize, (c[1]+1)*cellSize, 5*cellSize, 5*cellSize);
+        ctx2.fillStyle = '#000';
+        ctx2.fillRect((c[0]+2)*cellSize, (c[1]+2)*cellSize, 3*cellSize, 3*cellSize);
+    });
+
+    // Center logo
+    ctx2.fillStyle = '#fff';
+    ctx2.fillRect((modules/2-3)*cellSize, (modules/2-3)*cellSize, 6*cellSize, 6*cellSize);
+    ctx2.fillStyle = '#4CAF50';
+    ctx2.beginPath();
+    ctx2.arc(size/2, size/2, cellSize*2.5, 0, Math.PI*2);
+    ctx2.fill();
+    ctx2.fillStyle = '#fff';
+    ctx2.font = 'bold ' + Math.floor(cellSize * 3) + 'px sans-serif';
+    ctx2.textAlign = 'center';
+    ctx2.textBaseline = 'middle';
+    ctx2.fillText('$', size/2, size/2);
+}
+
+function confirmPayment() {
+    clearInterval(payTimer);
+    var status = document.getElementById('payStatus');
+    var confirmBtn = document.getElementById('payConfirmBtn');
+    status.textContent = '支付成功! 正在复活...';
+    status.className = 'pay-status success';
+    confirmBtn.disabled = true;
+
+    setTimeout(function() {
+        document.getElementById('paymentScreen').classList.add('hidden');
+        document.getElementById('paymentScreen').classList.add('payment-success');
+        revivePlayer();
+    }, 1500);
+}
+
+function cancelPayment() {
+    clearInterval(payTimer);
+    document.getElementById('paymentScreen').classList.add('hidden');
+    document.getElementById('gameOverScreen').classList.remove('hidden');
+    document.getElementById('payStatus').textContent = '请扫码完成支付';
+    document.getElementById('payStatus').className = 'pay-status';
+    document.getElementById('payConfirmBtn').disabled = false;
+}
+
+function revivePlayer() {
+    player.hp = player.maxHp;
+    player.x = 100;
+    player.y = game.groundY - player.h;
+    player.vx = 0;
+    player.vy = 0;
+    player.invincible = 180;
+    game.state = 'playing';
+    document.getElementById('hud').style.display = 'flex';
+    updateHUD();
+    showToast('复活成功! 无敌3秒!');
+
+    // Clear nearby enemies
+    enemies = enemies.filter(function(e) {
+        return Math.abs(e.x - player.x) > 150;
+    });
 }
 
 // === Toast (in-game) ===
