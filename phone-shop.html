@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XBAOS数字生活 | 手机专卖店</title>
+    <style>
+        :root {
+            --primary: #4A90D9;
+            --primary-light: #5B8DEF;
+            --primary-soft: #EBF3FC;
+            --primary-dark: #2E6EB8;
+            --bg: #F5F7FA;
+            --surface: #FFFFFF;
+            --text: #1A1A2E;
+            --text-secondary: #5A6C7D;
+            --text-muted: #95A5B7;
+            --border: #E8ECF0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.06);
+            --shadow-hover: 0 8px 32px rgba(74,144,217,0.15);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --success: #27AE60;
+            --warning: #E67E22;
+            --danger: #E74C3C;
+            --gold: #F1C40F;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            transition: box-shadow 0.3s;
+        }
+        .navbar.scrolled { box-shadow: 0 1px 8px rgba(0,0,0,0.06); }
+        .nav-container {
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            font-size: 20px; font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 28px; list-style: none; }
+        .nav-links a {
+            text-decoration: none; color: var(--text-secondary);
+            font-size: 14px; font-weight: 600;
+            transition: color 0.2s; position: relative; padding: 4px 0;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); }
+        .nav-links a.active::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+            height: 2px; background: var(--primary); border-radius: 2px;
+        }
+        .nav-cart {
+            display: flex; align-items: center; gap: 6px;
+            background: var(--primary-soft); color: var(--primary);
+            padding: 8px 16px; border-radius: 20px; font-size: 13px;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+            border: none; position: relative;
+        }
+        .nav-cart:hover { background: var(--primary); color: #fff; }
+        .cart-badge {
+            position: absolute; top: -4px; right: -4px;
+            background: var(--danger); color: #fff;
+            font-size: 10px; font-weight: 700;
+            min-width: 18px; height: 18px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 4px;
+        }
+        .nav-toggle { display: none; flex-direction: column; gap: 4px; cursor: pointer; background: none; border: none; }
+        .nav-toggle span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: 0.3s; }
+        .nav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .nav-toggle.open span:nth-child(2) { opacity: 0; }
+        .nav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        /* ===== Hero ===== */
+        .hero {
+            max-width: 1200px; margin: 0 auto; padding: 100px 24px 60px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+        }
+        .hero-text h1 {
+            font-size: 42px; font-weight: 800; line-height: 1.2; margin-bottom: 16px;
+        }
+        .hero-text h1 .highlight {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-text p {
+            font-size: 17px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7;
+        }
+        .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 28px; border-radius: var(--radius-sm); font-size: 15px;
+            font-weight: 700; cursor: pointer; border: none; transition: all 0.2s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(74,144,217,0.3); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary-soft); }
+
+        .hero-visual {
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .phone-mockup {
+            width: 240px; height: 480px;
+            background: linear-gradient(145deg, #1a1a2e, #2d2d44);
+            border-radius: 32px; padding: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2), inset 0 0 2px rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .phone-mockup::before {
+            content: ''; position: absolute; top: 16px; left: 50%;
+            transform: translateX(-50%); width: 80px; height: 6px;
+            background: #000; border-radius: 4px;
+        }
+        .phone-screen {
+            width: 100%; height: 100%;
+            border-radius: 22px; overflow: hidden;
+            background: linear-gradient(180deg, #4A90D9, #6BB6E8);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #fff; text-align: center; padding: 20px;
+        }
+        .phone-screen .brand { font-size: 28px; font-weight: 800; }
+        .phone-screen .model { font-size: 14px; opacity: 0.8; margin-top: 4px; }
+        .phone-screen .price { font-size: 22px; font-weight: 700; margin-top: 20px; }
+        .phone-screen .badge {
+            background: rgba(255,255,255,0.2); padding: 4px 12px;
+            border-radius: 12px; font-size: 11px; margin-top: 12px;
+        }
+
+        .hero-deco {
+            position: absolute; border-radius: 50%; filter: blur(40px); z-index: -1;
+        }
+        .hero-deco.d1 { width: 200px; height: 200px; background: rgba(74,144,217,0.15); top: -20px; right: -20px; }
+        .hero-deco.d2 { width: 150px; height: 150px; background: rgba(91,141,239,0.12); bottom: -10px; left: -10px; }
+
+        /* ===== Section ===== */
+        .section { max-width: 1200px; margin: 0 auto; padding: 60px 24px; }
+        .section-header { text-align: center; margin-bottom: 40px; }
+        .section-title { font-size: 30px; font-weight: 800; }
+        .section-subtitle { font-size: 15px; color: var(--text-muted); margin-top: 8px; }
+
+        /* ===== Category Tabs ===== */
+        .cat-tabs {
+            display: flex; gap: 8px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap;
+        }
+        .cat-tab {
+            padding: 10px 24px; border-radius: 20px; font-size: 14px;
+            font-weight: 600; cursor: pointer; border: 2px solid var(--border);
+            background: var(--surface); color: var(--text-secondary); transition: all 0.2s;
+        }
+        .cat-tab:hover { border-color: var(--primary); color: var(--primary); }
+        .cat-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* ===== Product Grid ===== */
+        .product-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+        }
+        .product-card {
+            background: var(--surface); border-radius: var(--radius); overflow: hidden;
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            transition: all 0.3s; cursor: pointer; display: flex; flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-6px); box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+        .product-img {
+            height: 200px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .product-img .phone-vis {
+            width: 80px; height: 140px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 11px; text-align: center;
+            padding: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .product-img .phone-vis::before {
+            content: ''; position: absolute; top: 6px; left: 50%;
+            transform: translateX(-50%); width: 30px; height: 3px;
+            background: rgba(0,0,0,0.3); border-radius: 2px;
+        }
+        .product-tag {
+            position: absolute; top: 10px; left: 10px;
+            padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 700; color: #fff; z-index: 2;
+        }
+        .tag-hot { background: var(--danger); }
+        .tag-new { background: var(--success); }
+        .tag-sale { background: var(--warning); }
+        .tag-vip { background: var(--gold); color: #1a1a2e; }
+
+        .product-info { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .product-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+        .product-specs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .spec-chip {
+            font-size: 10px; padding: 2px 8px; border-radius: 10px;
+            background: var(--primary-soft); color: var(--primary); font-weight: 600;
+        }
+        .product-bottom {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: auto;
+        }
+        .product-price { display: flex; flex-direction: column; }
+        .price-now { font-size: 20px; font-weight: 800; color: var(--danger); }
+        .price-old { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
+        .add-cart-btn {
+            background: var(--primary); color: #fff; border: none;
+            width: 36px; height: 36px; border-radius: 10px;
+            font-size: 18px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .add-cart-btn:hover { background: var(--primary-dark); transform: scale(1.1); }
+
+        /* ===== Banner Promo ===== */
+        .promo-banner {
+            max-width: 1200px; margin: 0 auto; padding: 0 24px;
+        }
+        .promo-inner {
+            background: linear-gradient(135deg, #1a1a2e, #2E6EB8);
+            border-radius: var(--radius); padding: 40px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center;
+            color: #fff; position: relative; overflow: hidden;
+        }
+        .promo-inner::before {
+            content: ''; position: absolute; top: -50%; right: -10%;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .promo-text h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+        .promo-text p { font-size: 15px; opacity: 0.85; margin-bottom: 20px; }
+        .promo-countdown { display: flex; gap: 12px; }
+        .countdown-box {
+            background: rgba(255,255,255,0.15); border-radius: 10px;
+            padding: 8px 16px; text-align: center; min-width: 60px;
+        }
+        .countdown-num { font-size: 24px; font-weight: 800; }
+        .countdown-label { font-size: 10px; opacity: 0.7; }
+        .promo-visual {
+            display: flex; justify-content: center;
+        }
+        .promo-phone {
+            width: 160px; height: 300px;
+            background: linear-gradient(145deg, #2d2d44, #1a1a2e);
+            border-radius: 24px; padding: 8px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .promo-phone-screen {
+            width: 100%; height: 100%; border-radius: 16px;
+            background: linear-gradient(180deg, #FFD700, #FFA000);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 800; color: #1a1a2e;
+        }
+
+        /* ===== Features ===== */
+        .features-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+        }
+        .feature-card {
+            text-align: center; padding: 28px 16px;
+            background: var(--surface); border-radius: var(--radius);
+            border: 1px solid var(--border); transition: all 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+        .feature-icon {
+            width: 56px; height: 56px; margin: 0 auto 16px;
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        .feature-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .feature-desc { font-size: 13px; color: var(--text-muted); }
+
+        /* ===== Cart Drawer ===== */
+        .cart-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .cart-overlay.open { opacity: 1; pointer-events: auto; }
+        .cart-drawer {
+            position: fixed; top: 0; right: 0; width: 380px; max-width: 90vw; height: 100vh;
+            background: var(--surface); z-index: 201; transform: translateX(100%);
+            transition: transform 0.3s; display: flex; flex-direction: column;
+            box-shadow: -8px 0 32px rgba(0,0,0,0.1);
+        }
+        .cart-drawer.open { transform: translateX(0); }
+        .cart-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cart-header h3 { font-size: 18px; font-weight: 700; }
+        .cart-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
+        .cart-item {
+            display: flex; gap: 12px; padding: 12px; border-radius: var(--radius-sm);
+            background: var(--bg); margin-bottom: 8px; align-items: center;
+        }
+        .cart-item-img {
+            width: 50px; height: 60px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; color: #fff; font-weight: 700;
+        }
+        .cart-item-info { flex: 1; min-width: 0; }
+        .cart-item-name { font-size: 14px; font-weight: 600; }
+        .cart-item-price { font-size: 13px; color: var(--danger); font-weight: 700; }
+        .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+        .qty-btn { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .cart-item-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; }
+        .cart-item-remove:hover { color: var(--danger); }
+        .cart-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .cart-empty-icon { font-size: 48px; margin-bottom: 12px; }
+        .cart-footer { padding: 20px; border-top: 1px solid var(--border); }
+        .cart-total { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 18px; font-weight: 700; }
+        .cart-checkout {
+            width: 100%; padding: 14px; background: var(--primary); color: #fff;
+            border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .cart-checkout:hover { background: var(--primary-dark); }
+        .cart-checkout:disabled { background: var(--border); cursor: not-allowed; }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-120%);
+            background: var(--text); color: #fff; padding: 14px 28px;
+            border-radius: 10px; font-size: 14px; font-weight: 600; z-index: 300;
+            transition: transform 0.4s; box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ===== Footer ===== */
+        footer {
+            background: #1a1a2e; color: #aaa; padding: 40px 24px 20px;
+            margin-top: 40px;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;
+        }
+        .footer-col h4 { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+        .footer-col a { display: block; color: #aaa; text-decoration: none; font-size: 13px; margin-bottom: 8px; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--primary-light); }
+        .footer-bottom {
+            max-width: 1200px; margin: 30px auto 0; padding-top: 20px;
+            border-top: 1px solid #333; text-align: center; font-size: 13px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; text-align: center; padding-top: 80px; }
+            .hero-btns { justify-content: center; }
+            .product-grid { grid-template-columns: 1fr 1fr; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .promo-inner { grid-template-columns: 1fr; text-align: center; }
+            .promo-countdown { justify-content: center; }
+            .footer-inner { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .nav-links { display: none; position: fixed; top: 64px; left: 0; right: 0; background: #fff; flex-direction: column; padding: 16px; gap: 4px; border-bottom: 1px solid var(--border); }
+            .nav-links.open { display: flex; }
+            .nav-links a { padding: 12px; border-radius: 8px; }
+            .nav-links a:hover { background: var(--primary-soft); }
+            .nav-toggle { display: flex; }
+            .hero-text h1 { font-size: 30px; }
+            .product-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .product-img { height: 140px; }
+            .product-img .phone-vis { width: 60px; height: 100px; font-size: 9px; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .section-title { font-size: 24px; }
+            .phone-mockup { width: 200px; height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-logo">XBAOS</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home" class="active">首页</a></li>
+            <li><a href="#products">全部手机</a></li>
+            <li><a href="#promo">限时特惠</a></li>
+            <li><a href="#features">服务保障</a></li>
+        </ul>
+        <button class="nav-cart" onclick="toggleCart()">
+            &#128722; 购物车
+            <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="home">
+    <div class="hero-text">
+        <h1>探索 <span class="highlight">数字生活</span><br>从一部好手机开始</h1>
+        <p>XBAOS数字生活专卖店，精选全球优质智能手机。正品行货，全国联保，支持以旧换新，24小时极速发货。</p>
+        <div class="hero-btns">
+            <a href="#products" class="btn btn-primary">&#128269; 浏览全部手机</a>
+            <a href="#promo" class="btn btn-outline">&#127775; 查看特惠</a>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="hero-deco d1"></div>
+        <div class="hero-deco d2"></div>
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="brand">XBAOS</div>
+                <div class="model">Ultra 15 Pro</div>
+                <div class="badge">&#127941; 年度旗舰</div>
+                <div class="price">&#65509;5999</div>
+                <div style="font-size:11px;opacity:0.7;margin-top:4px">&#128073; 12期免息</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products -->
+<section class="section" id="products">
+    <div class="section-header">
+        <h2 class="section-title">全部手机</h2>
+        <p class="section-subtitle">精选好机，总有一款适合你</p>
+    </div>
+
+    <div class="cat-tabs">
+        <button class="cat-tab active" onclick="filterCategory('all', this)">全部</button>
+        <button class="cat-tab" onclick="filterCategory('flagship', this)">旗舰机</button>
+        <button class="cat-tab" onclick="filterCategory('mid', this)">中端机</button>
+        <button class="cat-tab" onclick="filterCategory('budget', this)">性价比</button>
+        <button class="cat-tab" onclick="filterCategory('fold', this)">折叠屏</button>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+</section>
+
+<!-- Promo Banner -->
+<section class="promo-banner" id="promo" style="padding: 0 24px 60px">
+    <div class="promo-inner">
+        <div class="promo-text">
+            <h2>&#127775; 限时特惠 狂欢72小时</h2>
+            <p>Ultra 15 Pro 直降800元，叠加12期免息分期，到手价低至&#65509;5199！</p>
+            <div class="promo-countdown" id="countdown">
+                <div class="countdown-box"><div class="countdown-num" id="cdH">00</div><div class="countdown-label">时</div></div>
+                <div class="countdown-box"><div class="countdown-num" id="cdM">00</div><div class="countdown-label">分</div></div>
+                <div class="countdown-box"><div class="countdown-num" id="cdS">00</div><div class="countdown-label">秒</div></div>
+            </div>
+        </div>
+        <div class="promo-visual">
+            <div class="promo-phone">
+                <div class="promo-phone-screen">$</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features">
+    <div class="section-header">
+        <h2 class="section-title">服务保障</h2>
+        <p class="section-subtitle">购物无忧，售后贴心</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#EBF3FC">&#128241;</div>
+            <div class="feature-title">正品行货</div>
+            <div class="feature-desc">官方授权渠道，100%正品保障</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#E8F8EF">&#128737;</div>
+            <div class="feature-title">全国联保</div>
+            <div class="feature-desc">全国5000+服务点，1年质保</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#FEF9E7">&#9889;</div>
+            <div class="feature-title">24h极速发</div>
+            <div class="feature-desc">下午4点前下单，当天发出</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:#FDF0E6">&#128260;</div>
+            <div class="feature-title">以旧换新</div>
+            <div class="feature-desc">旧机最高抵扣2000元</div>
+        </div>
+    </div>
+</section>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>&#128722; 购物车</h3>
+        <button class="cart-close" onclick="toggleCart()">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">
+            <div class="cart-empty-icon">&#128722;</div>
+            <p>购物车空空如也~</p>
+        </div>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-total">
+            <span>合计</span>
+            <span id="cartTotal" style="color:var(--danger)">&#65509;0</span>
+        </div>
+        <button class="cart-checkout" id="checkoutBtn" disabled onclick="checkout()">去结算</button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-inner">
+        <div class="footer-col">
+            <h4>XBAOS数字生活</h4>
+            <a href="#">关于我们</a>
+            <a href="#">门店地址</a>
+            <a href="#">加入我们</a>
+            <a href="#">联系方式</a>
+        </div>
+        <div class="footer-col">
+            <h4>购物指南</h4>
+            <a href="#">购物流程</a>
+            <a href="#">支付方式</a>
+            <a href="#">分期付款</a>
+            <a href="#">以旧换新</a>
+        </div>
+        <div class="footer-col">
+            <h4>售后服务</h4>
+            <a href="#">退换货政策</a>
+            <a href="#">保修服务</a>
+            <a href="#">维修预约</a>
+            <a href="#">常见问题</a>
+        </div>
+        <div class="footer-col">
+            <h4>关注我们</h4>
+            <a href="#">&#128241; 微信公众号</a>
+            <a href="#">&#127919; 抖音旗舰店</a>
+            <a href="#">&#128242; 客服热线 400-000-0000</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>2026 XBAOS数字生活 &middot; 本页面为教学演示项目，商品信息仅供参考</p>
+    </div>
+</footer>
+
+<script>
+// ===== Product Data =====
+var products = [
+    { id: 1, name: 'Ultra 15 Pro', cat: 'flagship', tag: 'hot', tagText: '热销', desc: '6.7英寸 LTPO 2.0 &middot; 骁龙8 Gen4 &middot; 1英寸主摄', price: 5999, oldPrice: 6799, color1: '#4A90D9', color2: '#2E6EB8', specs: ['512GB','16GB','120W','5000mAh'] },
+    { id: 2, name: 'Nova Flip', cat: 'fold', tag: 'new', tagText: '新品', desc: '7.9英寸折叠屏 &middot; 悬浮铰链 &middot; 超薄机身', price: 7499, oldPrice: 7999, color1: '#8E44AD', color2: '#6C3483', specs: ['256GB','12GB','66W','4400mAh'] },
+    { id: 3, name: 'XBAOS 16', cat: 'flagship', tag: 'sale', tagText: '特惠', desc: '6.2英寸 &middot; A18芯片 &middot; 双摄系统', price: 4799, oldPrice: 5299, color1: '#2C3E50', color2: '#1a1a2e', specs: ['128GB','8GB','30W','3500mAh'] },
+    { id: 4, name: 'Nova 12 Lite', cat: 'mid', tag: '', tagText: '', desc: '6.5英寸 OLED &middot; 天玑8300 &middot; 一亿像素', price: 2199, oldPrice: 2499, color1: '#E67E22', color2: '#BA4A00', specs: ['256GB','8GB','67W','4500mAh'] },
+    { id: 5, name: 'Redmi Turbo', cat: 'budget', tag: 'hot', tagText: '爆款', desc: '6.67英寸 &middot; 骁龙8s &middot; 大电池长续航', price: 1599, oldPrice: 1799, color1: '#E74C3C', color2: '#C0392B', specs: ['256GB','12GB','67W','5500mAh'] },
+    { id: 6, name: 'Honor Magic6', cat: 'flagship', tag: 'vip', tagText: 'VIP', desc: '6.8英寸 &middot; 鹰眼相机 &middot; 鸿燕通信', price: 4999, oldPrice: 5499, color1: '#27AE60', color2: '#1E8449', specs: ['512GB','16GB','80W','5450mAh'] },
+    { id: 7, name: 'OnePlus Ace3', cat: 'mid', tag: 'new', tagText: '新品', desc: '6.78英寸 &middot; 天玑9300 &middot; 超级闪充', price: 2899, oldPrice: 3199, color1: '#F1C40F', color2: '#D4AC0D', specs: ['256GB','12GB','100W','5000mAh'] },
+    { id: 8, name: 'Realme GT7', cat: 'budget', tag: 'sale', tagText: '降价', desc: '6.7英寸 &middot; 骁龙7+ &middot; 电竞屏', price: 1899, oldPrice: 2299, color1: '#3498DB', color2: '#2471A3', specs: ['128GB','8GB','67W','5000mAh'] },
+    { id: 9, name: 'XBAOS SE', cat: 'budget', tag: '', tagText: '', desc: '5.4英寸 &middot; A16芯片 &middot; 紧凑旗舰', price: 3499, oldPrice: 3799, color1: '#95A5A6', color2: '#7F8C8D', specs: ['128GB','6GB','20W','3000mAh'] },
+    { id: 10, name: 'Nova 12 Ultra', cat: 'flagship', tag: 'hot', tagText: '热销', desc: '6.8英寸 &middot; 双卫星通信 &middot; 可变光圈', price: 6499, oldPrice: 6999, color1: '#2E86C1', color2: '#1A5276', specs: ['512GB','16GB','100W','5200mAh'] },
+    { id: 11, name: 'Mi Fold 4', cat: 'fold', tag: 'vip', tagText: 'VIP', desc: '8.0英寸折叠 &middot; 龙骨铰链 &middot; 徕卡四摄', price: 8999, oldPrice: 9999, color1: '#1ABC9C', color2: '#16A085', specs: ['1TB','16GB','120W','5000mAh'] },
+    { id: 12, name: 'Vivo X100', cat: 'mid', tag: 'new', tagText: '新品', desc: '6.78英寸 &middot; 天玑9300 &middot; 蔡司影像', price: 3299, oldPrice: 3999, color1: '#9B59B6', color2: '#7D3C98', specs: ['256GB','12GB','120W','5000mAh'] }
+];
+
+var cart = [];
+
+// ===== Render Products =====
+function renderProducts(cat) {
+    var grid = document.getElementById('productGrid');
+    var filtered = cat === 'all' ? products : products.filter(function(p) { return p.cat === cat; });
+
+    grid.innerHTML = filtered.map(function(p) {
+        var tagHtml = p.tag ? '<div class="product-tag tag-' + p.tag + '">' + p.tagText + '</div>' : '';
+        var specsHtml = p.specs.map(function(s) { return '<span class="spec-chip">' + s + '</span>'; }).join('');
+        var gradient = 'linear-gradient(145deg, ' + p.color1 + ', ' + p.color2 + ')';
+
+        return '<div class="product-card">' +
+            '<div class="product-img">' + tagHtml +
+                '<div class="phone-vis" style="background:' + gradient + '">' + p.name + '</div>' +
+            '</div>' +
+            '<div class="product-info">' +
+                '<div class="product-name">' + p.name + '</div>' +
+                '<div class="product-desc">' + p.desc + '</div>' +
+                '<div class="product-specs">' + specsHtml + '</div>' +
+                '<div class="product-bottom">' +
+                    '<div class="product-price">' +
+                        '<div class="price-now">&#65509;' + p.price + '</div>' +
+                        '<div class="price-old">&#65509;' + p.oldPrice + '</div>' +
+                    '</div>' +
+                    '<button class="add-cart-btn" onclick="addToCart(' + p.id + ')" title="加入购物车">+</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function filterCategory(cat, btn) {
+    document.querySelectorAll('.cat-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    renderProducts(cat);
+}
+
+// ===== Cart =====
+function addToCart(id) {
+    var product = products.find(function(p) { return p.id === id; });
+    if (!product) return;
+
+    var existing = cart.find(function(item) { return item.id === id; });
+    if (existing) {
+        existing.qty++;
+    } else {
+        cart.push({ id: id, name: product.name, price: product.price, color1: product.color1, color2: product.color2, qty: 1 });
+    }
+    renderCart();
+    showToast('已加入购物车: ' + product.name);
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(function(item) { return item.id !== id; });
+    renderCart();
+}
+
+function changeQty(id, delta) {
+    var item = cart.find(function(i) { return i.id === id; });
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        removeFromCart(id);
+    } else {
+        renderCart();
+    }
+}
+
+function renderCart() {
+    var el = document.getElementById('cartItems');
+    var badge = document.getElementById('cartBadge');
+    var totalEl = document.getElementById('cartTotal');
+    var checkoutBtn = document.getElementById('checkoutBtn');
+
+    var totalQty = cart.reduce(function(sum, i) { return sum + i.qty; }, 0);
+    var totalPrice = cart.reduce(function(sum, i) { return sum + i.price * i.qty; }, 0);
+
+    badge.textContent = totalQty;
+    badge.style.display = totalQty > 0 ? 'flex' : 'none';
+    totalEl.innerHTML = '&#65509;' + totalPrice.toLocaleString();
+    checkoutBtn.disabled = cart.length === 0;
+
+    if (cart.length === 0) {
+        el.innerHTML = '<div class="cart-empty"><div class="cart-empty-icon">&#128722;</div><p>购物车空空如也~</p></div>';
+        return;
+    }
+
+    el.innerHTML = cart.map(function(item) {
+        var gradient = 'linear-gradient(145deg, ' + item.color1 + ', ' + item.color2 + ')';
+        return '<div class="cart-item">' +
+            '<div class="cart-item-img" style="background:' + gradient + '">' + item.name.substring(0,4) + '</div>' +
+            '<div class="cart-item-info">' +
+                '<div class="cart-item-name">' + item.name + '</div>' +
+                '<div class="cart-item-price">&#65509;' + item.price + '</div>' +
+                '<div class="cart-item-qty">' +
+                    '<button class="qty-btn" onclick="changeQty(' + item.id + ', -1)">&minus;</button>' +
+                    '<span>' + item.qty + '</span>' +
+                    '<button class="qty-btn" onclick="changeQty(' + item.id + ', 1)">+</button>' +
+                '</div>' +
+            '</div>' +
+            '<button class="cart-item-remove" onclick="removeFromCart(' + item.id + ')">&times;</button>' +
+        '</div>';
+    }).join('');
+}
+
+function toggleCart() {
+    var drawer = document.getElementById('cartDrawer');
+    var overlay = document.getElementById('cartOverlay');
+    drawer.classList.toggle('open');
+    overlay.classList.toggle('open');
+}
+
+function checkout() {
+    var totalPrice = cart.reduce(function(sum, i) { return sum + i.price * i.qty; }, 0);
+    showToast('订单提交成功! 合计: &#65509;' + totalPrice.toLocaleString() + ' (演示)');
+    cart = [];
+    renderCart();
+    setTimeout(function() { toggleCart(); }, 1500);
+}
+
+// ===== Toast =====
+function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.innerHTML = '&#10003; ' + msg;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+// ===== Countdown =====
+var promoEnd = new Date().getTime() + 72 * 3600 * 1000;
+function updateCountdown() {
+    var now = new Date().getTime();
+    var diff = promoEnd - now;
+    if (diff <= 0) {
+        document.getElementById('cdH').textContent = '00';
+        document.getElementById('cdM').textContent = '00';
+        document.getElementById('cdS').textContent = '00';
+        return;
+    }
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cdH').textContent = String(h).padStart(2, '0');
+    document.getElementById('cdM').textContent = String(m).padStart(2, '0');
+    document.getElementById('cdS').textContent = String(s).padStart(2, '0');
+}
+
+// ===== Navbar Scroll =====
+var navbar = document.getElementById('navbar');
+var navLinks = document.getElementById('navLinks');
+var navToggle = document.getElementById('navToggle');
+var linkItems = navLinks.querySelectorAll('a');
+var sections = document.querySelectorAll('section[id]');
+
+window.addEventListener('scroll', function() {
+    navbar.classList.toggle('scrolled', window.scrollY > 10);
+    updateActiveLink();
+});
+
+navToggle.addEventListener('click', function() {
+    navLinks.classList.toggle('open');
+    navToggle.classList.toggle('open');
+});
+
+linkItems.forEach(function(link) {
+    link.addEventListener('click', function() {
+        navLinks.classList.remove('open');
+        navToggle.classList.remove('open');
+    });
+});
+
+function updateActiveLink() {
+    var scrollPos = window.scrollY + 80;
+    sections.forEach(function(sec) {
+        var top = sec.offsetTop;
+        var bottom = top + sec.offsetHeight;
+        var id = sec.id;
+        var link = document.querySelector('.nav-links a[href="#' + id + '"]');
+        if (link) {
+            if (scrollPos >= top && scrollPos < bottom) {
+                linkItems.forEach(function(l) { l.classList.remove('active'); });
+                link.classList.add('active');
+            }
+        }
+    });
+}
+
+// ===== Init =====
+renderProducts('all');
+renderCart();
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+
+</body>
+</html>
