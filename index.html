@@ -1,116 +1,798 @@
-========================================
-  个人网站单页HTML代码 · 完整教学提示词
-  从零到完整医院服务网页 · 共5步
-========================================
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康记忆翻牌 | Health Memory Match</title>
+    <style>
+        :root {
+            --primary: #4A90D9;
+            --primary-light: #5B8DEF;
+            --primary-soft: #EBF3FC;
+            --primary-hover: #3A7BC8;
+            --bg: #F0F4F8;
+            --surface: #FFFFFF;
+            --text: #2C3E50;
+            --text-secondary: #5A6C7D;
+            --text-muted: #95A5B7;
+            --border: #DDE4EB;
+            --success: #27AE60;
+            --success-soft: #E8F8EF;
+            --warning: #E67E22;
+            --warning-soft: #FDF0E6;
+            --danger: #E74C3C;
+            --shadow: 0 2px 12px rgba(74, 144, 217, 0.08);
+            --shadow-hover: 0 6px 24px rgba(74, 144, 217, 0.18);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
 
-【使用说明】
-学员只需按顺序依次发送以下5条提示词给AI，
-即可从零生成一个包含个人名片、患者服务指南、
-门诊挂号（4种类型+统计图表）、叫号提醒
-（语音播报+候诊队列管理）的完整单页HTML网站。
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-font-smoothing: antialiased;
+        }
 
-========================================
-第一步：生成基础个人名片页面
-========================================
+        /* ===== Header ===== */
+        .game-header {
+            text-align: center;
+            padding: 32px 24px 20px;
+        }
 
-请帮我生成一个个人网站的单页HTML代码，要求如下：
-- 这是一个个人名片/在线简历页面，用于展示我的个人简介。
-- 风格要求：简约、干净、现代，背景为浅色系（如白色或极浅灰色），文字使用深灰色，整体给人舒服、专业的感觉。
-- 页面需要包含以下模块：
-  - 顶部导航栏：包含"首页"、"关于我"、"联系我"三个菜单项。
-  - 个人头像/占位图：用圆形占位图展示，可以使用一个在线占位图链接。
-  - 昵称：大字展示，假设我叫"小包"。
-  - 一句话简介：比如"嗨嗨，这里是有趣的XBAOS频道！一起玩耍吧~"。
-  - 关于我：一段简短的文字介绍，写一些积极正面的个人描述。
-  - 社交图标：使用某某图标库，展示我的社交账号（链接留空或填#）。
-  - 页脚：显示版权信息，如"2026XBAOS"。
-- 重要：所有CSS样式和JavaScript代码请内嵌在同一个HTML文件中，不要拆分成多个文件，方便我直接使用。
-- 配色建议：主色使用柔和的蓝色调（比如#4A90D9或#5B8DEF），辅以白色背景，按钮和链接使用主色。
-- 页面要适配手机和电脑屏幕（响应式设计）。
-- 不要使用外部CSS框架（如Bootstrap），保持代码轻量。文件下载到 E:\桌面临时文件\ai课
+        .game-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
 
+        .game-title .accent {
+            color: var(--primary);
+        }
 
-========================================
-第二步：确定方向（思考方向，不一定要发给AI）
-========================================
+        .game-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
 
-如果我是一名医院的工作者，你觉得这个网页内容还可以怎么做哪些方向呢
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
 
-【教学要点】
-这一步是引导学员思考"网站为谁服务"的方向性问题。
-AI会给出多个方向建议，学员选择其中一个进入下一步。
+        .stat-pill {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
 
+        .stat-pill svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--primary);
+        }
 
-========================================
-第三步：改版为患者服务方向
-========================================
+        .stat-pill .stat-val {
+            color: var(--primary);
+            font-weight: 700;
+            min-width: 28px;
+            text-align: center;
+        }
 
-预约与联系入口，患者服务指南，这个方向，改一下
+        /* ===== Difficulty Selector ===== */
+        .diff-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
 
-【教学要点】
-重点是内容改版——保留页面框架和配色体系，
-替换内容为医院场景：就诊流程、检查注意事项、
-取药须知、医保报销、门诊排班表、联系方式等。
+        .diff-btn {
+            padding: 10px 24px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow);
+        }
 
+        .diff-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
 
-========================================
-第四步：添加门诊挂号功能
-========================================
+        .diff-btn.active {
+            background: var(--primary);
+            color: #FFFFFF;
+            border-color: var(--primary);
+        }
 
-很好，在这个html代码基础上加一个选项，就是门诊挂号选项，可以选择4个意思，并统计数据，随便编造
+        .diff-btn small {
+            opacity: 0.7;
+            font-weight: 400;
+            margin-left: 4px;
+        }
 
-【教学要点】
-重点是交互组件设计——4种门诊类型选择卡片
-（普通门诊、专家门诊、急诊、特需门诊），
-点击选择后确认挂号，统计数据实时更新，
-包含今日挂号总数、等候人数、平均等候时间、满意度，
-以及各门诊类型挂号分布柱状图、近7日挂号趋势图。
+        /* ===== Game Board ===== */
+        .board-wrap {
+            width: 100%;
+            max-width: 560px;
+            padding: 0 16px;
+            display: flex;
+            justify-content: center;
+        }
 
+        .board {
+            display: grid;
+            gap: 10px;
+            width: 100%;
+        }
 
-========================================
-第五步：添加叫号提醒功能
-========================================
+        .board.easy {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 420px;
+        }
 
-很好，能不能有一个提醒的环节，比如我到哪一位患者就诊了，设置闹钟叫患者名的环节，试一下
+        .board.medium {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 480px;
+        }
 
-【教学要点】
-重点是高级交互——
-- 叫号大屏显示（当前叫号、患者姓名、就诊诊室）
-- Web Audio API生成三声上升音阶提示音
-- Web Speech API语音播报"请XXX到第5诊室就诊"
-- 候诊队列管理（预置患者、添加新患者、叫号、跳过）
-- 叫号大屏脉冲动画、Toast提示
+        .board.hard {
+            grid-template-columns: repeat(6, 1fr);
+            max-width: 560px;
+        }
 
+        /* ===== Card ===== */
+        .card {
+            aspect-ratio: 1;
+            perspective: 600px;
+            cursor: pointer;
+        }
 
-========================================
-附录：额外扩展项目提示词
-========================================
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
 
-【扩展1：网页小游戏 - 记忆翻牌】
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
 
-请帮我生成一个网页小游戏的单页HTML代码，自己设计内容，文件保存到指定路径。
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
 
-【扩展2：网页小游戏 - 动作射击】
+        .card.matched .card-face-front {
+            opacity: 0.4;
+        }
 
-不要这个游戏，有没有动态类的如射击，冰火人跑图这些游戏，自己设计内容，文件保存原路径
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
 
-【扩展3：停车场实时监控】
+        .card-face-front {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            box-shadow: 0 2px 8px rgba(74, 144, 217, 0.25);
+            transition: opacity 0.3s ease, box-shadow 0.3s ease;
+        }
 
-来一个实时监控停车场的网页展示，展示哪些停车位有车，时间，收费，平面图展示，那个位置等等，有车走就提醒语音播报，入口进入播报，等等环节越多越好，生成新的HTML
+        .card-face-front svg {
+            width: 40%;
+            height: 40%;
+            fill: rgba(255, 255, 255, 0.85);
+        }
 
+        .card:hover:not(.flipped):not(.matched) .card-face-front {
+            box-shadow: 0 4px 16px rgba(74, 144, 217, 0.4);
+        }
 
-========================================
-  教学建议
-========================================
+        .card-face-back {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            transform: rotateY(180deg);
+            font-size: 32px;
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
 
-第1步：页面结构、CSS配色体系、响应式布局基础
-第2步：引导思考"网站为谁服务"的方向性问题
-第3步：内容改版——保留框架、替换内容的思路
-第4步：交互组件——选项卡选择+统计图表+数据联动
-第5步：高级交互——Web Audio API音频+Web Speech API语音合成+队列状态管理
+        .card.matched .card-face-back {
+            border-color: var(--success);
+            background: var(--success-soft);
+        }
 
-扩展项目：
-- 记忆翻牌：CSS 3D动画、游戏状态机、星级评分
-- 动作射击：Canvas游戏循环、碰撞检测、粒子系统、波次系统
-- 停车场监控：实时数据模拟、语音播报、阶梯计费、多维统计图表
+        .card.shake .card-inner {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotateY(180deg) translateX(0); }
+            25% { transform: rotateY(180deg) translateX(-6px); }
+            75% { transform: rotateY(180deg) translateX(6px); }
+        }
+
+        .card.matched .card-face-back {
+            animation: matchPop 0.4s ease;
+        }
+
+        @keyframes matchPop {
+            0% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.08); }
+            100% { transform: rotateY(180deg) scale(1); }
+        }
+
+        /* ===== Action Buttons ===== */
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ===== Win Modal ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(44, 62, 80, 0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--success-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .modal-icon svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--success);
+        }
+
+        .modal h2 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .modal-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .modal-stat {
+            text-align: center;
+        }
+
+        .modal-stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .modal-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .modal-rating {
+            font-size: 22px;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+        }
+
+        /* ===== Toast ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--text);
+            color: #FFFFFF;
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 300;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== Confetti ===== */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            z-index: 250;
+            animation: fall linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh) rotate(720deg);
+                opacity: 0.3;
+            }
+        }
+
+        /* ===== Footer ===== */
+        .game-footer {
+            text-align: center;
+            padding: 20px 24px;
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 520px) {
+            .game-title {
+                font-size: 24px;
+            }
+
+            .card-face-back {
+                font-size: 24px;
+            }
+
+            .stat-pill {
+                padding: 6px 14px;
+                font-size: 13px;
+            }
+
+            .diff-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .board.hard {
+                gap: 6px;
+            }
+
+            .modal {
+                padding: 28px 20px;
+            }
+
+            .modal-stats {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-header">
+    <h1 class="game-title">健康<span class="accent">记忆</span>翻牌</h1>
+    <p class="game-subtitle">翻开卡片，找出相同的健康图标配对</p>
+</div>
+
+<div class="stats-bar">
+    <div class="stat-pill">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        时间 <span class="stat-val" id="timerDisplay">00:00</span>
+    </div>
+    <div class="stat-pill">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+        翻牌 <span class="stat-val" id="movesDisplay">0</span>
+    </div>
+    <div class="stat-pill">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        配对 <span class="stat-val" id="pairsDisplay">0/0</span>
+    </div>
+</div>
+
+<div class="diff-bar">
+    <button class="diff-btn active" data-level="easy" onclick="setDifficulty('easy')">简单 <small>6对</small></button>
+    <button class="diff-btn" data-level="medium" onclick="setDifficulty('medium')">中等 <small>8对</small></button>
+    <button class="diff-btn" data-level="hard" onclick="setDifficulty('hard')">困难 <small>12对</small></button>
+</div>
+
+<div class="board-wrap">
+    <div class="board easy" id="board"></div>
+</div>
+
+<div class="actions">
+    <button class="btn btn-primary" onclick="startGame()">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        开始游戏
+    </button>
+    <button class="btn btn-secondary" onclick="startGame()">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        重新开始
+    </button>
+</div>
+
+<div class="game-footer">
+    2026 XBAOS Games &middot; 训练记忆力，守护脑健康
+</div>
+
+<!-- Win Modal -->
+<div class="modal-overlay" id="winModal">
+    <div class="modal">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h2>恭喜通关！</h2>
+        <p id="winMessage">你的记忆力很棒！</p>
+        <div class="modal-rating" id="winRating">&#11088;&#11088;&#11088;</div>
+        <div class="modal-stats">
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="winTime">00:00</div>
+                <div class="modal-stat-label">用时</div>
+            </div>
+            <div class="modal-stat">
+                <div class="modal-stat-value" id="winMoves">0</div>
+                <div class="modal-stat-label">翻牌次数</div>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="closeModal(); startGame()" style="margin: 0 auto;">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+            再玩一局
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // 12 health-themed emojis as card pairs
+    var ALL_CARDS = [
+        '&#128138;', '&#129657;', '&#128150;', '&#10084;&#65039;',
+        '&#129658;', '&#129514;', '&#127973;', '&#9889;',
+        '&#128064;', '&#129505;', '&#128170;', '&#127807;'
+    ];
+
+    var DIFFICULTY = {
+        easy:   { pairs: 6, cols: 4 },
+        medium: { pairs: 8, cols: 4 },
+        hard:   { pairs: 12, cols: 6 }
+    };
+
+    var currentLevel = 'easy';
+    var cards = [];
+    var flippedCards = [];
+    var matchedPairs = 0;
+    var totalPairs = 0;
+    var moves = 0;
+    var startTime = null;
+    var timerInterval = null;
+    var gameStarted = false;
+    var locked = false;
+
+    function setDifficulty(level) {
+        currentLevel = level;
+        document.querySelectorAll('.diff-btn').forEach(function(btn) {
+            btn.classList.toggle('active', btn.dataset.level === level);
+        });
+        var board = document.getElementById('board');
+        board.className = 'board ' + level;
+        startGame();
+    }
+
+    function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+        return arr;
+    }
+
+    function startGame() {
+        var config = DIFFICULTY[currentLevel];
+        totalPairs = config.pairs;
+        matchedPairs = 0;
+        moves = 0;
+        flippedCards = [];
+        gameStarted = false;
+        locked = false;
+
+        var selected = ALL_CARDS.slice(0, config.pairs);
+        var deck = shuffle(selected.concat(selected.slice()));
+
+        cards = deck.map(function(emoji, idx) {
+            return { id: idx, emoji: emoji, flipped: false, matched: false };
+        });
+
+        document.getElementById('movesDisplay').textContent = '0';
+        document.getElementById('pairsDisplay').textContent = '0/' + totalPairs;
+        document.getElementById('timerDisplay').textContent = '00:00';
+
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        renderBoard();
+        showToast('游戏开始！翻开卡片找到配对');
+    }
+
+    function renderBoard() {
+        var board = document.getElementById('board');
+        board.innerHTML = '';
+
+        cards.forEach(function(card) {
+            var div = document.createElement('div');
+            div.className = 'card';
+            div.dataset.id = card.id;
+            div.innerHTML =
+                '<div class="card-inner">' +
+                    '<div class="card-face card-face-front">' +
+                        '<svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 11h-3v3h-4v-3H7v-4h3V7h4v3h3v4z"/></svg>' +
+                    '</div>' +
+                    '<div class="card-face card-face-back">' + card.emoji + '</div>' +
+                '</div>';
+            div.addEventListener('click', function() { flipCard(card.id); });
+            board.appendChild(div);
+        });
+    }
+
+    function flipCard(id) {
+        if (locked) return;
+        var card = cards[id];
+        if (card.flipped || card.matched) return;
+
+        if (!gameStarted) {
+            gameStarted = true;
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        card.flipped = true;
+        var el = document.querySelector('.card[data-id="' + id + '"]');
+        el.classList.add('flipped');
+        flippedCards.push(card);
+
+        if (flippedCards.length === 2) {
+            moves++;
+            document.getElementById('movesDisplay').textContent = moves;
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        var a = flippedCards[0];
+        var b = flippedCards[1];
+
+        if (a.emoji === b.emoji) {
+            a.matched = true;
+            b.matched = true;
+            matchedPairs++;
+
+            setTimeout(function() {
+                document.querySelector('.card[data-id="' + a.id + '"]').classList.add('matched');
+                document.querySelector('.card[data-id="' + b.id + '"]').classList.add('matched');
+                flippedCards = [];
+
+                document.getElementById('pairsDisplay').textContent = matchedPairs + '/' + totalPairs;
+
+                if (matchedPairs === totalPairs) {
+                    gameWin();
+                }
+            }, 300);
+        } else {
+            locked = true;
+            var elA = document.querySelector('.card[data-id="' + a.id + '"]');
+            var elB = document.querySelector('.card[data-id="' + b.id + '"]');
+            elA.classList.add('shake');
+            elB.classList.add('shake');
+
+            setTimeout(function() {
+                a.flipped = false;
+                b.flipped = false;
+                elA.classList.remove('flipped', 'shake');
+                elB.classList.remove('flipped', 'shake');
+                flippedCards = [];
+                locked = false;
+            }, 900);
+        }
+    }
+
+    function updateTimer() {
+        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+        var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        var s = String(elapsed % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = m + ':' + s;
+    }
+
+    function gameWin() {
+        clearInterval(timerInterval);
+        var elapsed = Math.floor((Date.now() - startTime) / 1000);
+        var m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        var s = String(elapsed % 60).padStart(2, '0');
+        var timeStr = m + ':' + s;
+
+        var rating, message;
+        var perfectMoves = totalPairs;
+
+        if (moves <= perfectMoves * 1.3) {
+            rating = '&#11088;&#11088;&#11088;';
+            message = '记忆力超群！你是健康达人！';
+        } else if (moves <= perfectMoves * 1.8) {
+            rating = '&#11088;&#11088;';
+            message = '不错的成绩！继续训练大脑吧～';
+        } else {
+            rating = '&#11088;';
+            message = '通关成功！多练习会越来越棒！';
+        }
+
+        document.getElementById('winTime').textContent = timeStr;
+        document.getElementById('winMoves').textContent = moves;
+        document.getElementById('winRating').innerHTML = rating;
+        document.getElementById('winMessage').textContent = message;
+
+        setTimeout(function() {
+            document.getElementById('winModal').classList.add('show');
+            launchConfetti();
+        }, 500);
+    }
+
+    function closeModal() {
+        document.getElementById('winModal').classList.remove('show');
+    }
+
+    function launchConfetti() {
+        var colors = ['#4A90D9', '#5B8DEF', '#27AE60', '#E67E22', '#9B59B6', '#E74C3C', '#F1C40F'];
+        for (var i = 0; i < 50; i++) {
+            (function(idx) {
+                setTimeout(function() {
+                    var c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + '%';
+                    c.style.background = colors[idx % colors.length];
+                    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    c.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+                    if (Math.random() > 0.5) c.style.borderRadius = '50%';
+                    document.body.appendChild(c);
+                    setTimeout(function() { c.remove(); }, 4500);
+                }, idx * 60);
+            })(i);
+        }
+    }
+
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function() {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    startGame();
+</script>
+
+</body>
+</html>
